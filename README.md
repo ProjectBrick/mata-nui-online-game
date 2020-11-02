@@ -1,2 +1,3 @@
-# mata-nui-online-game
-Mata Nui Online Game
+# Mata Nui Online Game
+
+The original Mata Nui Online Game, with automatic progress saving.

@@ -1,0 +1,9 @@
+<font face="verdana, helvetica" size="2"><b>Mata Nui - Tips and Tricks</b></font><br><br>
+    		<font face="verdana, helvetica" size="1">Sometimes the mysteries of Mata Nui can be difficult to unravel. That's why the Bionicle team has put together some hints to help you find your way around the island. Click on the section where you're having trouble and you'll see a list of questions. If you find the question that applies to your problem, click on it. If you click once you'll receive a hint, click again and you may receive another hint. Each question may have several tips to help you along. Good luck!<br><br>
+<% qa.sections.forEach(s => { %>
+<b><%= s.text; %></b><br>
+<% s.questions.forEach(q => { %>  Q. <%= q.text; %><br>
+<% q.answers.forEach(a => { %>  - <%= a; %><br>
+<% }); %><br>
+<% }); %>
+<% }); %>

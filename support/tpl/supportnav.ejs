@@ -1,0 +1,65 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+
+
+
+<%- await include('shared/common'); %>
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0" width="215">
+
+
+	<tr>
+		<td><img src="bionicle/images/txt213x28us0support.gif" width="213" height="28" border="0"></td>
+	</tr>
+	<tr>
+		<td><a href="<%= route.supportmain(1); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(1); %>')"><font face="verdana, helvetica" size="1">Mata Nui Game -  General</font><br><br></a></td>
+	</tr>
+	<tr>
+		<td><a href="<%= route.supportmain(2); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(2); %>')"><font face="verdana, helvetica" size="1">Mata Nui Game - Tips and Hints</font><br><br></a></td>
+	</tr>
+	<tr>
+		<td><a href="<%= route.supportmain(7); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(7); %>')"><font face="verdana, helvetica" size="1">Bionicle Decoder</font><br><br></a></td>
+	</tr>
+	<tr>
+		<td><a href="<%= route.supportmain(3); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(3); %>')"><font face="verdana, helvetica" size="1">LEGO Bionicle CD-Roms</font><br><br></a></td>
+	</tr>
+	<tr>
+		<td><a href="<%= route.supportmain(4); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(4); %>')"><font face="verdana, helvetica" size="1">Nestl&eacute; Sponsored LEGO Bionicle CD-Rom</font><br><br></a></td>
+	</tr>
+	
+	<tr>
+		<td><a href="<%= route.supportmain(5); %>" target="supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(5); %>')"><font face="verdana, helvetica" size="1">GENERAL TROUBLESHOOTING</font><br><br></a></td>
+	</tr>	
+	
+<!--	<tr>
+		<td><a href="<%= route.supportmain(3); %>" target="Supportmain" onclick="javascript:RefreshBottom('<%= route.supportbottom(3); %>')"><font face="verdana, helvetica" size="1">LEGO Bionicle CD-Roms</font><br><br></a></td>
+	</tr> -->
+
+
+
+</table>
+<script language="javascript">
+function RefreshBottom(sSupport)
+{
+	// PATCH:
+	// Cannot call parent frame from file:// in modern browsers.
+	// See supportframe for the other half of patch. 
+	// Catch error and use postMessage instead to send a message.
+	// Message is handled in a listener added in the parent.
+	try {
+		parent.supportbottom.location = sSupport;
+	}
+	catch (err) {
+		parent.postMessage({supportbottom: {location: sSupport}}, "*");
+	}
+	//alert(parent.window.name); 
+}
+</script>
+
+</body>
+</html>

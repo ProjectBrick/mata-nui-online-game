@@ -1,0 +1,42 @@
+name: mac
+
+on:
+  push:
+    branches-ignore:
+    - pages
+
+jobs:
+  build:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.15.0'
+
+    - run: |
+        npm install
+        npm run shockpkg update --summary
+        npm run shockpkg install \
+          flash-player-32.0.0.445-mac-sa \
+          flash-player-32.0.0.445-mac-sa-debug
+        npm run build:mac
+        npm run build:mac-debug
+        npm run dist:mac:tgz
+        npm run dist:mac:dmg
+      shell: bash
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: |
+          build/
+          dist/
+
+    - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: dist/*

@@ -1,0 +1,48 @@
+{
+	"private": true,
+	"version": "0.0.0",
+	"author": "Project Brick",
+	"copyright": "Copyright 2001 The LEGO Group and Templar Studios. Unofficial release by Project Brick.",
+	"scripts": {
+		"shockpkg": "shockpkg",
+		"gulp": "gulp",
+		"clean": "gulp clean",
+		"build:browser": "gulp build:browser",
+		"build:windows": "gulp build:windows",
+		"build:windows-debug": "gulp build:windows-debug",
+		"build:mac": "gulp build:mac",
+		"build:mac-debug": "gulp build:mac-debug",
+		"build:linux-i386": "gulp build:linux-i386",
+		"build:linux-i386-debug": "gulp build:linux-i386-debug",
+		"build:linux-x86_64": "gulp build:linux-x86_64",
+		"build:linux-x86_64-debug": "gulp build:linux-x86_64-debug",
+		"dist:browser:zip": "gulp dist:browser:zip",
+		"dist:browser:tgz": "gulp dist:browser:tgz",
+		"dist:windows:zip": "gulp dist:windows:zip",
+		"dist:windows:exe": "gulp dist:windows:exe",
+		"dist:mac:tgz": "gulp dist:mac:tgz",
+		"dist:mac:dmg": "gulp dist:mac:dmg",
+		"dist:linux-i386:tgz": "gulp dist:linux-i386:tgz",
+		"dist:linux-x86_64:tgz": "gulp dist:linux-x86_64:tgz",
+		"run:browser": "gulp run:browser"
+	},
+	"optionalDependencies": {
+		"appdmg": "^0.6.0"
+	},
+	"dependencies": {
+		"@shockpkg/cli": "^1.5.1",
+		"@shockpkg/core": "^1.12.1",
+		"@shockpkg/plist-dom": "^1.7.1",
+		"@shockpkg/swf-projector": "^2.5.1",
+		"archiver": "^5.0.2",
+		"ejs": "^3.1.5",
+		"fast-glob": "^3.2.4",
+		"fs-extra": "^9.0.1",
+		"gulp": "^4.0.2",
+		"innosetup": "^6.0.5",
+		"mime-types": "^2.1.27",
+		"slugify": "^1.4.6",
+		"tar": "^6.0.5",
+		"yauzl": "^2.10.0"
+	}
+}

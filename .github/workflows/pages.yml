@@ -1,0 +1,38 @@
+name: pages
+
+on:
+  push:
+    branches:
+    - pages
+
+env:
+  MNOG_API_URL: https://www.maskofdestiny.com/wp-admin/admin-ajax.php?action=mod-game-save-api
+  MNOG_API_NAME: MaskOfDestiny
+  MNOG_API_LINK: https://www.maskofdestiny.com/
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.15.0'
+
+    - run: |
+        npm install
+        npm run build:browser
+      shell: bash
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: |
+          build/
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/browser/data

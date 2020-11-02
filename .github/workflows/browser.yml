@@ -1,0 +1,37 @@
+name: browser
+
+on:
+  push:
+    branches-ignore:
+    - pages
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.15.0'
+
+    - run: |
+        npm install
+        npm run build:browser
+        npm run dist:browser:zip
+        npm run dist:browser:tgz
+      shell: bash
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: |
+          build/
+          dist/
+
+    - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: dist/*

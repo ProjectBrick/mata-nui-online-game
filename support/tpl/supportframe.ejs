@@ -1,0 +1,51 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<link REL="SHORTCUT ICON" HREF="favicon.ico">
+
+
+
+<%- await include('shared/redirect'); %>
+<%- await include('shared/common'); %>
+
+
+
+<script>
+// PATCH:
+// Cannot call parent frame from file:// in modern browsers.
+// Handler for cross-frame communication.
+// See supportnav for the other half of patch. 
+if (window.addEventListener) {
+	window.addEventListener("message", function(e) {
+		// Check that origin matches, only allow null for file protocol.
+		if (e.origin !== window.origin) {
+			return;
+		}
+		if (!window.origin || window.origin === "null") {
+			if (window.location.protocol.toLowerCase() !== "file:") {
+				return;
+			}
+		}
+		if (e.data && e.data.supportbottom && e.data.supportbottom.location) {
+			supportbottom.location = e.data.supportbottom.location;
+		}
+	}, false);
+}
+</script>
+
+<TITLE>LEGO Technic - Bionicle - Support</TITLE>
+</head>
+
+<frameset ROWS="74,*" FRAMEBORDER="0" FRAMESPACING="0" BORDER="0">
+  <frame name="globalnav" target="contents" noresize scrolling="no" marginwidth="0" marginheight="0" src="<%= route.globalnav(); %>">
+  <FRAMESET ROWS="39,*,22" FRAMEBORDER="0" FRAMESPACING="0" BORDER="0">
+    <FRAME NORESIZE="yes" SCROLLING="no" SRC="<%= route.press(); %>" marginwidth="0" marginheight="0">			   
+    <FRAMESET COLS="220,*" FRAMEBORDER="0" FRAMESPACING="0" BORDER="0"> 
+      <FRAME NAME="supportnav" SCROLLING="no" SRC="<%= route.supportnav(); %>">
+      <FRAME NAME="supportmain" SCROLLING="yes" SRC="<%= route.supportmain(support); %>">
+    </FRAMESET>
+       <FRAME NAME="supportbottom" NORESIZE="yes" SCROLLING="no" SRC="<%= route.supportbottom(support); %>">
+  </FRAMESET>			
+</frameset>
+
+</html>

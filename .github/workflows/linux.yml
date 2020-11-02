@@ -1,0 +1,46 @@
+name: linux
+
+on:
+  push:
+    branches-ignore:
+    - pages
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14.15.0'
+
+    - run: |
+        npm install
+        npm run shockpkg update --summary
+        npm run shockpkg install \
+          flash-player-11.2.202.644-linux-i386-sa \
+          flash-player-11.2.202.644-linux-i386-sa-debug \
+          flash-player-32.0.0.445-linux-x86_64-sa \
+          flash-player-32.0.0.445-linux-x86_64-sa-debug
+        npm run build:linux-i386
+        npm run build:linux-i386-debug
+        npm run build:linux-x86_64
+        npm run build:linux-x86_64-debug
+        npm run dist:linux-i386:tgz
+        npm run dist:linux-x86_64:tgz
+      shell: bash
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: |
+          build/
+          dist/
+
+    - uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: dist/*

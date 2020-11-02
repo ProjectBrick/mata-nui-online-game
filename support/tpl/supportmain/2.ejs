@@ -1,0 +1,35 @@
+
+
+<font face="verdana, helvetica" size="2">
+<b>Mata Nui Game - Tips and Hints</b></font><br><br>
+<font face="verdana, helvetica" size="1">
+Sometimes the mysteries of Mata Nui can be difficult to unravel. That's why the Bionicle team has put together some hints to help you find your way around the island. Click on the section where you're having trouble and you'll see a list of questions. If you find the question that applies to your problem, click on it. If you click once you'll receive a hint, click again and you may receive another hint. Each question may have several tips to help you along. Good luck!<br><br>
+
+<% qa.sections.forEach((s, sI) => { %>
+<a href="<%= route.supportmain(2, sI + 1); %>"><b><%= s.text; %></b></a><br>
+	<% if (level === (sI + 1)) { %>
+		<% s.questions.forEach((q, qI) => { %>
+			<a href="<%=
+				question === (qI + 1) ?
+					route.supportmain(
+						2,
+						sI + 1,
+						(answer || 0) < q.answers.length ? qI + 1 : null,
+						(answer || 0) < q.answers.length ? (answer || 0) + 1 : null
+					) :
+					route.supportmain(
+						2,
+						sI + 1,
+						qI + 1,
+						1
+					);
+			%>"><%= q.text; %></a><br>
+			<% if (question === (qI + 1)) { %>
+				<% q.answers.filter((a, aI) => aI < (answer || 0)).forEach((a, aI) => { %>
+				<%= '- ' + a; %><br>
+				<% }); %>
+			<% } %>
+			<br>
+		<% }); %>
+	<% } %>
+<% }); %>
