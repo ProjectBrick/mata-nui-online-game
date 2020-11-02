@@ -1,0 +1,1 @@
+NumStatements=3&Statement_1=I+have+heard+all+that+you+have+done+for+our+village,+adventurer,+but+I+especially+owe+you+thanks.&Statement_2=I+will+soon+be+fit+enough+to+return+to+Koli,+and+to+Maku.+If+you+see+her+in+your+travels,+tell+her+I+am+well!&Statement_3=Hup!+Hup!+Hup!

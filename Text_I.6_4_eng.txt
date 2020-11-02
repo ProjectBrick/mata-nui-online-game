@@ -1,0 +1,1 @@
+Question1=Yes.&Question2=No.&MovieName1=Episode_3-1.swf&VerticalShift1=0&HorizontalShift1=1&ShiftOff1=1&TextIsLoaded=1&MovieName2=I.5-S.swf&VerticalShift2=0&HorizontalShift2=1&ShiftOff2=0&AskMe=Sail+to+Ga-Koro?

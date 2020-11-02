@@ -1,0 +1,1 @@
+NumStatements=5&Statement_1=Wenn+du+die+Straﬂe+nach+Po-Koro+suchst,+Reisender,+achte+darauf,+die+richtige+Straﬂe+zu+nehmen.+Ist+es+die+rechte?+Oder+ist+es+die+linke?&Statement_2=Heiﬂ+genug?&Statement_3=Noch+ein+original+Hafu...&Statement_4=Hast+du+schon+eine+Ahnung,+was+es+ist?&Statement_5=Wow...manchmal+bin+ich+selbst+von+mir+beeindruckt.

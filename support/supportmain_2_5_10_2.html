@@ -1,0 +1,318 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+
+
+<style type="text/css">
+#newsclipd { HEIGHT: 130px; LEFT: 330px; POSITION: absolute; TOP: 165px; WIDTH: 395px; Z-INDEX: 3; }
+#newsd { LEFT: 0px; POSITION: absolute; TOP: 0px; VISIBILITY: hidden; WIDTH: 395px; Z-INDEX: 2; }
+#respect { HEIGHT: 288px; LEFT: 425px; POSITION: absolute; TOP: 400px; WIDTH: 300px; Z-INDEX: 4; }
+</style>
+
+<script language="Javascript">
+<!-- hide
+
+ns4 = (document.layers)? 1:0
+ie4 = (document.all)? 1:0
+ie5 = (navigator.appVersion.indexOf('MSIE 5')>0)? 1:0
+
+var isNav,isIE,coll,styleObj;
+var coll = "";
+var styleObj = "";
+var menuitems = 3;
+
+if (parseInt(navigator.appVersion) >= 4) {
+	if (navigator.appName == "Netscape") {
+		isNav = true
+	} else {
+		isIE = true
+		coll = "all."
+		styleObj = ".style"
+	}
+}
+
+function WM_netscapeCssFix() {
+
+  if (document.WM.WM_netscapeCssFix.initWindowWidth != window.innerWidth || document.WM.WM_netscapeCssFix.initWindowHeight != window.innerHeight) {
+    document.location = document.location;
+  }
+}
+
+function WM_netscapeCssFixCheckIn() {
+  if (ns4) {
+    if (typeof document.WM == 'undefined'){
+      document.WM = new Object;
+    }
+    if (typeof document.WM.WM_scaleFont == 'undefined') {
+      document.WM.WM_netscapeCssFix = new Object;
+      document.WM.WM_netscapeCssFix.initWindowWidth = window.innerWidth;
+      document.WM.WM_netscapeCssFix.initWindowHeight = window.innerHeight;
+    }
+    window.onresize = WM_netscapeCssFix;
+  }
+}
+
+WM_netscapeCssFixCheckIn()
+
+function init() {
+        newsclip = new pointer("newsclipd")
+        news = new pointer("newsd", "newsclipd") 
+        newsclip.clipto(0,395,133,0)
+		news.show()
+        var windowHeight = (document.layers)? (newsclip.p.clip.bottom - newsclip.p.clip.top) : newsclip.height
+        var contentHeight = (document.layers)? news.doc.height : news.event.scrollHeight
+	if (contentHeight<=134) { hidearrows(); }
+        offsetHeight = contentHeight - windowHeight
+}
+
+function hidearrows() {
+// PATCH:
+// Not funcitonal, unclear what it would have done.
+// Disabled to prevent error.
+//   var arrow1 = eval("document." + coll + "scroller" + styleObj);
+//   var arrow2 = eval("document." + coll + "scroller1" + styleObj);
+//   arrow1.visibility = "hidden";
+//   arrow2.visibility = "hidden";
+}
+function pointer(name, path) {
+      if (ns4) {
+                if (!path) this.p = document.layers[name]       
+                else this.p = eval("document."+path+".document."+name)
+                this.elm = this.event = this.p
+
+                this.x = this.p.left
+                this.y = this.p.top
+                this.width = this.p.clip.width
+                this.height = this.p.clip.height 
+                this.doc = this.p.document
+                }
+
+        else if (ie4) {
+                this.p = document.all[name].style 
+                this.elm = this.event = document.all[name]
+                this.x = this.elm.offsetLeft
+                this.y = this.elm.offsetTop
+                if (ie5) {
+                        this.width = this.elm.offsetWidth
+                        this.height = this.elm.offsetHeight     
+                }       
+                else {
+                        this.width = this.p.pixelWidth
+                        this.height = this.p.pixelHeight
+                        
+                }
+        }
+
+      this.name = name
+        this.obj = name + "pointer"
+        eval (this.obj+"=this")
+        this.moveto = pointerMoveTo
+        this.moveby = pointerMoveBy
+		this.s_up = pointerScrollUp 
+		this.s_down = pointerScrollDown
+        this.clipto = pointerClipTo
+        this.getclip = pointerGetClip
+		this.show = pointerShow
+}
+
+function scrollup() {
+         		move = 1
+				news.s_up(0, 1)
+		 	}
+function scrolldown() {
+				move = 1
+		 		news.s_down(-offsetHeight, 1)
+		 }
+function scrollstop() { move = 0; }
+
+function pointerMoveTo(x,y) {
+        this.x = x
+        if (ns4) this.p.left = x
+        else this.p.pixelLeft = x
+        this.y = y
+        if (ns4) this.p.top = y
+        else this.p.pixelTop = y
+}
+function pointerMoveBy(x,y) { this.moveto(this.x+x, this.y+y) }
+function pointerGetClip(corner) {
+        if (ns4) {
+                if (corner == "t") return this.p.clip.top
+                else if (corner == "r") return this.p.clip.right
+                else if (corner == "b") return this.p.clip.bottom
+                else if (corner == "l") return this.p.clip.left
+        }
+        else if (ie4) {
+                var temp = this.p.clip.split("rect(")[1].split(")")[0].split("px")
+                if (corner == "t") return Number(temp[0])
+                else if (corner == "r") return Number(temp[1])
+                else if (corner == "b") return Number(temp[2])
+                else if (corner == "l") return Number(temp[3])
+        }
+}
+function pointerClipTo(t,r,b,l) {
+        if (ie4) this.p.clip = "rect("+t+"px "+r+"px "+b+"px "+l+"px)" 
+        else if (ns4) {
+                this.p.clip.top = t
+                this.p.clip.right = r
+                this.p.clip.bottom = b
+                this.p.clip.left = l
+        }
+}
+function pointerScrollUp(y,speed) {
+        if (move) {
+			if (this.y <= y) {
+        	        this.moveby(0,0.4)
+            	    setTimeout(this.obj+".s_up("+y+","+speed+")",speed)
+        	}
+		}
+}		
+function pointerScrollDown(y,speed) {		
+ 		if (move) {
+       		 if (this.y >= y) {
+    	         this.moveby(0,-0.4)
+        	     setTimeout(this.obj+".s_down("+y+","+speed+")",speed)
+        	}
+     	}
+}
+function pointerShow() {
+	if (ns4) this.p.visibility = "show"
+	else this.p.visibility = "visible"
+}
+
+function showobj(which) {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// var obj = eval("document." + coll + "calltext" + which + styleObj);
+	// obj.visibility = "visible";
+}
+
+function hideall() {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// for (i=1;i<=menuitems;i++) {
+	// 	var obj = eval("document." + coll + "calltext" + i + styleObj);
+	// 	obj.visibility="hidden";
+	// }
+}
+// end hide -->
+
+</script>
+
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0" width="525">
+
+	<tr>
+		<td>
+		
+		<a href="supportprint_2.html" target="_new"><img src="bionicle/images/und143x28us0printable.gif" width="143" height="28" border="0"></a>		
+		
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+
+<font face="verdana, helvetica" size="2">
+<b>Mata Nui Game - Tips and Hints</b></font><br><br>
+<font face="verdana, helvetica" size="1">
+Sometimes the mysteries of Mata Nui can be difficult to unravel. That's why the Bionicle team has put together some hints to help you find your way around the island. Click on the section where you're having trouble and you'll see a list of questions. If you find the question that applies to your problem, click on it. If you click once you'll receive a hint, click again and you may receive another hint. Each question may have several tips to help you along. Good luck!<br><br>
+
+
+<a href="supportmain_2_1.html"><b>On the Beach</b></a><br>
+	
+
+<a href="supportmain_2_2.html"><b>Ta-Koro</b></a><br>
+	
+
+<a href="supportmain_2_3.html"><b>Ga-Koro</b></a><br>
+	
+
+<a href="supportmain_2_4.html"><b>Po-Wahi and Po-Koro</b></a><br>
+	
+
+<a href="supportmain_2_5.html"><b>Onu-Koro</b></a><br>
+	
+		
+			<a href="supportmain_2_5_1_1.html">I&#39;m at the entrance to the cave and there are some strange creatures there. What do I do?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_2_1.html">I just got off the crab ride into the underground tunnels. Where do I go?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_3_1.html">I&#39;ve talked to Onepu. Where do I go now?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_4_1.html">I&#39;ve talked to Onepu and Whenua, where do I go now?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_5_1.html">I&#39;ve come to a fork in the road. Which way should I go?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_6_1.html">I&#39;ve come back to the fork in the road, which way do I go?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_7_1.html">How can I get across the lava overflow?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_8_1.html">What do I do with the lava surfboard?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_9_1.html">How do I drain the lava?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_10_3.html">I&#39;ve wandered back into the mines and I see an elevator. What does it do?</a><br>
+			
+				
+				- Take the elevator down and talk to the Tohunga there.<br>
+				
+				- What does he ask you?<br>
+				
+			
+			<br>
+		
+			<a href="supportmain_2_5_11_1.html">I&#39;ve got the Tohunga&#39;s message. How do I get back to Ga-Koro?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_12_1.html">I&#39;m back in Ga-Koro. Where is the astrologer?</a><br>
+			
+			<br>
+		
+			<a href="supportmain_2_5_13_1.html">I&#39;m back in Onu-Koro in the mine with the sundial. What do I do?</a><br>
+			
+			<br>
+		
+	
+
+<a href="supportmain_2_6.html"><b>Le-Koro</b></a><br>
+	
+
+<a href="supportmain_2_7.html"><b>Ko-Koro</b></a><br>
+	
+
+<a href="supportmain_2_8.html"><b>Kini-Nui</b></a><br>
+	
+
+</td>
+	</tr>
+
+</table>
+
+
+</body>
+</html>

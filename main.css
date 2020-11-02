@@ -1,0 +1,163 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+html {
+	line-height: 1.25;
+	-webkit-text-size-adjust: 100%;
+}
+a {
+	background-color: transparent;
+}
+img {
+	border-style: none;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	background: #000000;
+	color: #999999;
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+object,
+embed {
+	display: block;
+	outline: 0;
+}
+object:focus,
+embed:focus {
+	outline: 0;
+}
+
+a {
+	color: #FF9900;
+	text-decoration: none;
+}
+
+button {
+	cursor: pointer;
+	border: 2px solid #999999;
+	background: #333333;
+	color: #FF9900;
+	text-transform: uppercase;
+	padding: 0.125em 0.25em;
+	font-size: 1em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #FFFFFF;
+	text-transform: uppercase;
+	font-weight: normal;
+}
+
+p {
+	margin: 1em 0;
+}
+
+.main {
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+.menu {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.menu-view {
+	margin: 0 auto;
+	width: 770px;
+	min-height: 475px;
+	display: none;
+}
+
+.saving-title {
+	text-align: center;
+	font-size: 2.5em;
+	margin-bottom: 1.25em;
+}
+
+.saving-options {
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+}
+.saving-option {
+	display: table-cell;
+	border: 0;
+	border-left: 2px dotted #666666;
+	padding: 0 4em;
+	width: 50%;
+
+	/* IE6-7: */
+	*width: 100%;
+	*border-left: 0;
+	*padding: 0 0 2em;
+}
+.saving-option:first-child {
+	border: 0;
+	padding-left: 0;
+}
+.saving-option:last-child {
+	padding-right: 0;
+}
+.saving-option-title {
+	font-size: 1.5em;
+	margin-bottom: 0.5em;
+}
+
+.saving .info-connected-loading,
+.saving .info-connected-error,
+.saving .info-connected-guest,
+.saving .info-connected-user {
+	display: none;
+}
+.saving.data-connected-loading .info-connected-loading {
+	display: block;
+}
+.saving.data-connected-error .info-connected-error {
+	display: block;
+}
+.saving.data-connected-guest .info-connected-guest {
+	display: block;
+}
+.saving.data-connected-user .info-connected-user {
+	display: block;
+}
+.saving .info-connected-loading,
+.saving .info-connected-error {
+	color: #FFFFFF;
+	text-transform: uppercase;
+}
+
+.saving .profile {
+	display: table;
+	width: 100%;
+	background: #333333;
+}
+.saving .profile .avatar,
+.saving .profile .name {
+	display: table-cell;
+	vertical-align: middle;
+	padding: 0.25em;
+	border: 2px solid #999999;
+}
+.saving .profile .avatar {
+	line-height: 0;
+	border-right: 0;
+	width: 0;
+}
+.saving .profile .name {
+	border-left: 0;
+}

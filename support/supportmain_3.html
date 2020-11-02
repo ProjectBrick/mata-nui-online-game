@@ -1,0 +1,294 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+
+
+<style type="text/css">
+#newsclipd { HEIGHT: 130px; LEFT: 330px; POSITION: absolute; TOP: 165px; WIDTH: 395px; Z-INDEX: 3; }
+#newsd { LEFT: 0px; POSITION: absolute; TOP: 0px; VISIBILITY: hidden; WIDTH: 395px; Z-INDEX: 2; }
+#respect { HEIGHT: 288px; LEFT: 425px; POSITION: absolute; TOP: 400px; WIDTH: 300px; Z-INDEX: 4; }
+</style>
+
+<script language="Javascript">
+<!-- hide
+
+ns4 = (document.layers)? 1:0
+ie4 = (document.all)? 1:0
+ie5 = (navigator.appVersion.indexOf('MSIE 5')>0)? 1:0
+
+var isNav,isIE,coll,styleObj;
+var coll = "";
+var styleObj = "";
+var menuitems = 3;
+
+if (parseInt(navigator.appVersion) >= 4) {
+	if (navigator.appName == "Netscape") {
+		isNav = true
+	} else {
+		isIE = true
+		coll = "all."
+		styleObj = ".style"
+	}
+}
+
+function WM_netscapeCssFix() {
+
+  if (document.WM.WM_netscapeCssFix.initWindowWidth != window.innerWidth || document.WM.WM_netscapeCssFix.initWindowHeight != window.innerHeight) {
+    document.location = document.location;
+  }
+}
+
+function WM_netscapeCssFixCheckIn() {
+  if (ns4) {
+    if (typeof document.WM == 'undefined'){
+      document.WM = new Object;
+    }
+    if (typeof document.WM.WM_scaleFont == 'undefined') {
+      document.WM.WM_netscapeCssFix = new Object;
+      document.WM.WM_netscapeCssFix.initWindowWidth = window.innerWidth;
+      document.WM.WM_netscapeCssFix.initWindowHeight = window.innerHeight;
+    }
+    window.onresize = WM_netscapeCssFix;
+  }
+}
+
+WM_netscapeCssFixCheckIn()
+
+function init() {
+        newsclip = new pointer("newsclipd")
+        news = new pointer("newsd", "newsclipd") 
+        newsclip.clipto(0,395,133,0)
+		news.show()
+        var windowHeight = (document.layers)? (newsclip.p.clip.bottom - newsclip.p.clip.top) : newsclip.height
+        var contentHeight = (document.layers)? news.doc.height : news.event.scrollHeight
+	if (contentHeight<=134) { hidearrows(); }
+        offsetHeight = contentHeight - windowHeight
+}
+
+function hidearrows() {
+// PATCH:
+// Not funcitonal, unclear what it would have done.
+// Disabled to prevent error.
+//   var arrow1 = eval("document." + coll + "scroller" + styleObj);
+//   var arrow2 = eval("document." + coll + "scroller1" + styleObj);
+//   arrow1.visibility = "hidden";
+//   arrow2.visibility = "hidden";
+}
+function pointer(name, path) {
+      if (ns4) {
+                if (!path) this.p = document.layers[name]       
+                else this.p = eval("document."+path+".document."+name)
+                this.elm = this.event = this.p
+
+                this.x = this.p.left
+                this.y = this.p.top
+                this.width = this.p.clip.width
+                this.height = this.p.clip.height 
+                this.doc = this.p.document
+                }
+
+        else if (ie4) {
+                this.p = document.all[name].style 
+                this.elm = this.event = document.all[name]
+                this.x = this.elm.offsetLeft
+                this.y = this.elm.offsetTop
+                if (ie5) {
+                        this.width = this.elm.offsetWidth
+                        this.height = this.elm.offsetHeight     
+                }       
+                else {
+                        this.width = this.p.pixelWidth
+                        this.height = this.p.pixelHeight
+                        
+                }
+        }
+
+      this.name = name
+        this.obj = name + "pointer"
+        eval (this.obj+"=this")
+        this.moveto = pointerMoveTo
+        this.moveby = pointerMoveBy
+		this.s_up = pointerScrollUp 
+		this.s_down = pointerScrollDown
+        this.clipto = pointerClipTo
+        this.getclip = pointerGetClip
+		this.show = pointerShow
+}
+
+function scrollup() {
+         		move = 1
+				news.s_up(0, 1)
+		 	}
+function scrolldown() {
+				move = 1
+		 		news.s_down(-offsetHeight, 1)
+		 }
+function scrollstop() { move = 0; }
+
+function pointerMoveTo(x,y) {
+        this.x = x
+        if (ns4) this.p.left = x
+        else this.p.pixelLeft = x
+        this.y = y
+        if (ns4) this.p.top = y
+        else this.p.pixelTop = y
+}
+function pointerMoveBy(x,y) { this.moveto(this.x+x, this.y+y) }
+function pointerGetClip(corner) {
+        if (ns4) {
+                if (corner == "t") return this.p.clip.top
+                else if (corner == "r") return this.p.clip.right
+                else if (corner == "b") return this.p.clip.bottom
+                else if (corner == "l") return this.p.clip.left
+        }
+        else if (ie4) {
+                var temp = this.p.clip.split("rect(")[1].split(")")[0].split("px")
+                if (corner == "t") return Number(temp[0])
+                else if (corner == "r") return Number(temp[1])
+                else if (corner == "b") return Number(temp[2])
+                else if (corner == "l") return Number(temp[3])
+        }
+}
+function pointerClipTo(t,r,b,l) {
+        if (ie4) this.p.clip = "rect("+t+"px "+r+"px "+b+"px "+l+"px)" 
+        else if (ns4) {
+                this.p.clip.top = t
+                this.p.clip.right = r
+                this.p.clip.bottom = b
+                this.p.clip.left = l
+        }
+}
+function pointerScrollUp(y,speed) {
+        if (move) {
+			if (this.y <= y) {
+        	        this.moveby(0,0.4)
+            	    setTimeout(this.obj+".s_up("+y+","+speed+")",speed)
+        	}
+		}
+}		
+function pointerScrollDown(y,speed) {		
+ 		if (move) {
+       		 if (this.y >= y) {
+    	         this.moveby(0,-0.4)
+        	     setTimeout(this.obj+".s_down("+y+","+speed+")",speed)
+        	}
+     	}
+}
+function pointerShow() {
+	if (ns4) this.p.visibility = "show"
+	else this.p.visibility = "visible"
+}
+
+function showobj(which) {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// var obj = eval("document." + coll + "calltext" + which + styleObj);
+	// obj.visibility = "visible";
+}
+
+function hideall() {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// for (i=1;i<=menuitems;i++) {
+	// 	var obj = eval("document." + coll + "calltext" + i + styleObj);
+	// 	obj.visibility="hidden";
+	// }
+}
+// end hide -->
+
+</script>
+
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0" width="525">
+
+	<tr>
+		<td>
+		
+		<a href="supportprint_3.html" target="_new"><img src="bionicle/images/und143x28us0printable.gif" width="143" height="28" border="0"></a>		
+		
+		</td>
+	</tr>
+
+	<tr>
+		<td><font face="verdana, helvetica" size="2"><b>LEGO Bionicle CD-Rom (80mm) Mini and (120mm) Normal</b></font><br><br>
+    		
+			<img src="bionicle/images/front.jpg" width="200" height="120" border="0" align="left" hspace="10" vspace="1"></img>
+			
+			<font face="verdana, helvetica" size="1"><b>SYSTEM REQUIREMENTS AND COMPATIBLITY</b><br><br>
+			
+			<b>What are the minimum system requirements for LEGO Bionicle?</b><br>
+			100% WINDOWS (R) 95/98/ Millennium DirectX (TM) 7 Compatible Computer required.<br>
+			CPU: PENTIUM (R) MMX(TM) 166MHz or equivalent.<br>
+			MEMORY: 32 MB RAM or higher required.<br>
+			VIDEO: 4MB DirectX (TM) Compatible Video Card.<br>
+			CD-ROM: 4X or faster CD-ROM/DVD drive required.<br>
+			SOUND CARD: 100% WINDOWS (R) 95/98/ Millennium DirectX (TM) (DirectSound) compatible sound<br><br>
+
+			<b>Will LEGO Bionicle work with Windows 2000, Windows NT, Macintosh, or Linux operating systems?</b><br>
+			LEGO Bionicle has been tested and is supported on the Windows 95, Windows 98 & Windows Millennium platforms. We have not tested LEGO Bionicle on Windows 2000, Windows NT, Macintosh or Linux and therefore we are not able to provide technical support for these platforms.<br><br> 
+
+			<b>My computer is just under the minimum system requirements should I try LEGO Bionicle anyway?</b><br>
+			No. LEGO Bionicle minimum system requirements were tested extensively before the release of the product. We do not recommend the use of LEGO Bionicle software on a system below the minimum system requirements.<br><br> 
+
+			<b>IDENTIFICATION</b><br><br>
+
+			<b>What is the Difference between the small CD Rom (80mm) and the Normal CD Rom (120mm)?</b><br>
+			There are many versions of the Bionicle CD. Depending how you received the CD is how to determine what is on it. All of the CDs have informational movies about Bionicle, and web links to other Bionicle sites. The regular size CDs are exactly the same unless the have Nestlé printed on the label. Theses CD-ROM's have a game and more information about Bionicle, plus LEGO Bionicle Screen Savers and Wallpaper. 
+			<br><br>Both of the Promotional CDs are limited in stock and we regret that we cannot replace or exchange the CDs under any circumstance.<br><br>
+
+			<b>NAVIGATION</b><br><br>
+			<img src="bionicle/images/stones.jpg" width="200" height="120" border="0" align="right" hspace="10" vspace="1"></img>
+			
+			<b>How do I get access to the full movies?</b><br>
+			Enter the 3-digit code from the inside of your TOA Mask, using the arrows located on the first screen of the LEGO Bionicle Program.<br><br>
+
+			<b>I can see the movies without entering the codes, what’s going on?</b><br>
+			What you can see is just a compilation of all of the video clips. By entering the code you will be able to view the full feature video of the individual TOA.<br><br> 
+
+			<b>LOADING</b><br><br>
+
+			<b>I insert my LEGO Bionicle CD into my CD ROM drive and nothing happens, what do I do?</b><br>
+			Your CD ROM drive might not be set to Autorun.<br> 
+			Open windows explorer<br>
+			Select your CD ROM drive letter, in most cases this will be D:<br>
+			Double click on setup.exe. <br>
+			This will start the LEGO Bionicle installation program.<br><br> 
+
+			<b>My computer cannot read my LEGO Bionicle CD.</b><br>
+			The CD-ROM drive reads the CD with an optical laser. If there are any dust particles, smudges or fingerprints on the silver side of the CD the CD-ROM drive may have difficulty reading the CD. This difficulty can result in error messages, lock ups and blue screens.<br><br> 
+			To clean the CD, use warm soapy water and a soft cloth towel. Only wipe the CD from the inside out like the spokes on a wheel with a soft lint free cloth. Make sure the CD is completely dry before using it in the computer.<br><br>
+
+			<b>Why do QuickTime and Direct X have to be installed?</b><br><br>
+			In order to view the movies you have to have QuickTime. Many of the LEGO programs use the DirectX components to manage sound and video within the program. If you are experiencing choppy sound or broken or choppy video please review your settings with the DirectX diagnostics tool, you can see this under DIRECT X in <a href="supportframe_5.html" target="_top">General Troubleshooting</a>.<br><br>
+
+			<b>I don’t have a tray on my CD- ROM drive; can I use the LEGO Bionicle Mini CD?</b><br>
+			No, it is not recommended. LEGO Bionicle mini CD needs a support tray or caddy to run in this type of CD-Rom drive. If you are not sure what kind of CD Rom Drive you have, contact your computer manufacture to find out.<br><br>
+
+			<b>Sometimes my LEGO Bionicle program freezes, what can I do?</b><br>
+			First you should ensure that your computer meets the minimum specifications. Then ensure you have no other programs running in the background. Help on how to do this can be found in the section Close Programs in Background, which is found under <a href="supportframe_5.html" target="_top">General Troubleshooting</a>.
+			<br><br>
+			<b>When I put my LEGO Bionicle CD-ROM in the CD-ROM drive I get a message asking if I want to re-install or uninstall LEGO Bionicle. But I haven’t installed it yet.</b><br>
+			You might have another version of LEGO Bionicle installed.  If you get more than one LEGO Bionicle promotional CD-ROM it is not necessary to re-install every one.  
+			<br><br>
+			<b>WEB ACESS</b><br><br>
+			<b>What is the Web Code for on the side of the LEGO Bionicle can?</b><br>
+			With the web code and the code from the inside of your mask you can gain access to extra features on the LEGO Bionicle website.<br><br>
+
+			<b>My Web Code doesn’t work, I get this message; <i>"Incorrect codes! Make sure you have the matching codes from mask and can, and try again".</i></b><br>
+			 Make sure you are on the TOA page that corresponds to the Mask. i.e., if you have the TOA TAHU, then you would want to be on the TOA TAHU page. 
+
+		
+		</font></td>
+	</tr>
+
+</table>
+
+
+</body>
+</html>

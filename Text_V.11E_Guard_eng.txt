@@ -1,0 +1,1 @@
+NumStatements=3&Statement_1=This+is+the+Tarakava+that+attacked+the+village.+Don't+be+afraid...+he+is+no+longer+under+the+dark+influence+of+Makuta.&Statement_2=Shhh...+he+is+resting.+He+has+been+through+a+great+ordeal.+In+time+he+may+be+tamed.&Statement_3=Sometimes+Rahi+become+infected+by+Makuta's+darkness.+Only+by+removing+their+mask+can+they+be+saved.

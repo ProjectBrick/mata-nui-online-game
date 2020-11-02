@@ -1,0 +1,1 @@
+Question1=Yes&Question2=No&MovieName1=XI.CrabRide1.swf&VerticalShift1=0&HorizontalShift1=1&ShiftOff1=1&TextIsLoaded=1&MovieName2=X.6-S.swf&VerticalShift2=0&HorizontalShift2=1&ShiftOff2=0&AskMe=Ride+the+crab?&Sound_ChangeBackgroundMovie1=1&Sound_Background1=Amb_tunnel.swf&Sound_ChangeSFXMovie1=1&Sound_SFXMovie1=Sound_Caves.swf&

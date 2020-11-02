@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Mata Nui Online Game</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<link rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div class="main">
+			<div class="menu">
+				<div
+					class="menu-view saving"
+					data-ls-prefix="matanuionlinegame."
+					data-api-prefix="matanuionlinegame."
+					data-api-url="https://www.maskofdestiny.com/wp-admin/admin-ajax.php?action=mod-game-save-api"
+				>
+					<h1 class="saving-title">Mata Nui Online Game</h1>
+					<div class="saving-options">
+						<div class="saving-option continue-local">
+							<h2 class="saving-option-title">Local Save:</h2>
+							<p>Continue with progress saving to your browser's local storage.</p>
+							<p>Note that if your browser's local storage is cleared you will lose your progress.</p>
+							<p><button data-action="SavingLocal">Enter</button></p>
+						</div>
+						<div class="saving-option continue-user">
+							<h2 class="saving-option-title">Account Save:</h2>
+							<p>Continue with progress saving to your <a href="https://www.maskofdestiny.com/">MaskOfDestiny</a> account.</p>
+							<div class="info-connected-loading">
+								<p>Loading...</p>
+							</div>
+							<div class="info-connected-error">
+								<p>Failed to connect to the account service.</p>
+							</div>
+							<div class="info-connected-guest">
+								<p>You are not current logged into your account.</p>
+								<p><button data-action="LoginUser">Login</button></p>
+							</div>
+							<div class="info-connected-user">
+								<p><a class="profile"><span class="avatar"><img width="48" height="48" alt="Avatar" class="avatar-img"></span><span class="name"></span></a></p>
+								<p><button data-action="SavingUser">Enter</button> <button data-action="Logout">Logout</button></p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="menu-view player"
+					data-variable-prefix="matanui_"
+					data-variable-list="date language state"
+				>
+					<script type="text/html" class="swfcode">
+						<object
+							classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+							codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0"
+							width="770"
+							height="475"
+							id="player"
+							name="player"
+						>
+							<param name="name" value="player">
+							<param name="movie" value="matanuionlinegame.swf">
+							<param name="quality" value="high">
+							<param name="bgcolor" value="#000000">
+							<param name="allowfullscreen" value="true"> 
+							<param name="flashvars" value="%FLASHVARS%">
+							<embed
+								type="application/x-shockwave-flash"
+								pluginspage="http://www.macromedia.com/go/getflashplayer"
+								width="770"
+								height="475"
+								name="player"
+								src="matanuionlinegame.swf"
+								quality="high"
+								bgcolor="#000000"
+								allowfullscreen="true"
+								flashvars="%FLASHVARS%"
+							>
+						</object>
+					</script>
+				</div>
+			</div>
+		</div>
+		<script src="main.js"></script>
+	</body>
+</html>

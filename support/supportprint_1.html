@@ -1,0 +1,254 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<link REL="SHORTCUT ICON" HREF="favicon.ico">
+
+
+<style type="text/css">
+#newsclipd { HEIGHT: 130px; LEFT: 330px; POSITION: absolute; TOP: 165px; WIDTH: 395px; Z-INDEX: 3; }
+#newsd { LEFT: 0px; POSITION: absolute; TOP: 0px; VISIBILITY: hidden; WIDTH: 395px; Z-INDEX: 2; }
+#respect { HEIGHT: 288px; LEFT: 425px; POSITION: absolute; TOP: 400px; WIDTH: 300px; Z-INDEX: 4; }
+</style>
+
+<script language="Javascript">
+<!-- hide
+
+ns4 = (document.layers)? 1:0
+ie4 = (document.all)? 1:0
+ie5 = (navigator.appVersion.indexOf('MSIE 5')>0)? 1:0
+
+var isNav,isIE,coll,styleObj;
+var coll = "";
+var styleObj = "";
+var menuitems = 3;
+
+if (parseInt(navigator.appVersion) >= 4) {
+	if (navigator.appName == "Netscape") {
+		isNav = true
+	} else {
+		isIE = true
+		coll = "all."
+		styleObj = ".style"
+	}
+}
+
+function WM_netscapeCssFix() {
+
+  if (document.WM.WM_netscapeCssFix.initWindowWidth != window.innerWidth || document.WM.WM_netscapeCssFix.initWindowHeight != window.innerHeight) {
+    document.location = document.location;
+  }
+}
+
+function WM_netscapeCssFixCheckIn() {
+  if (ns4) {
+    if (typeof document.WM == 'undefined'){
+      document.WM = new Object;
+    }
+    if (typeof document.WM.WM_scaleFont == 'undefined') {
+      document.WM.WM_netscapeCssFix = new Object;
+      document.WM.WM_netscapeCssFix.initWindowWidth = window.innerWidth;
+      document.WM.WM_netscapeCssFix.initWindowHeight = window.innerHeight;
+    }
+    window.onresize = WM_netscapeCssFix;
+  }
+}
+
+WM_netscapeCssFixCheckIn()
+
+function init() {
+        newsclip = new pointer("newsclipd")
+        news = new pointer("newsd", "newsclipd") 
+        newsclip.clipto(0,395,133,0)
+		news.show()
+        var windowHeight = (document.layers)? (newsclip.p.clip.bottom - newsclip.p.clip.top) : newsclip.height
+        var contentHeight = (document.layers)? news.doc.height : news.event.scrollHeight
+	if (contentHeight<=134) { hidearrows(); }
+        offsetHeight = contentHeight - windowHeight
+}
+
+function hidearrows() {
+// PATCH:
+// Not funcitonal, unclear what it would have done.
+// Disabled to prevent error.
+//   var arrow1 = eval("document." + coll + "scroller" + styleObj);
+//   var arrow2 = eval("document." + coll + "scroller1" + styleObj);
+//   arrow1.visibility = "hidden";
+//   arrow2.visibility = "hidden";
+}
+function pointer(name, path) {
+      if (ns4) {
+                if (!path) this.p = document.layers[name]       
+                else this.p = eval("document."+path+".document."+name)
+                this.elm = this.event = this.p
+
+                this.x = this.p.left
+                this.y = this.p.top
+                this.width = this.p.clip.width
+                this.height = this.p.clip.height 
+                this.doc = this.p.document
+                }
+
+        else if (ie4) {
+                this.p = document.all[name].style 
+                this.elm = this.event = document.all[name]
+                this.x = this.elm.offsetLeft
+                this.y = this.elm.offsetTop
+                if (ie5) {
+                        this.width = this.elm.offsetWidth
+                        this.height = this.elm.offsetHeight     
+                }       
+                else {
+                        this.width = this.p.pixelWidth
+                        this.height = this.p.pixelHeight
+                        
+                }
+        }
+
+      this.name = name
+        this.obj = name + "pointer"
+        eval (this.obj+"=this")
+        this.moveto = pointerMoveTo
+        this.moveby = pointerMoveBy
+		this.s_up = pointerScrollUp 
+		this.s_down = pointerScrollDown
+        this.clipto = pointerClipTo
+        this.getclip = pointerGetClip
+		this.show = pointerShow
+}
+
+function scrollup() {
+         		move = 1
+				news.s_up(0, 1)
+		 	}
+function scrolldown() {
+				move = 1
+		 		news.s_down(-offsetHeight, 1)
+		 }
+function scrollstop() { move = 0; }
+
+function pointerMoveTo(x,y) {
+        this.x = x
+        if (ns4) this.p.left = x
+        else this.p.pixelLeft = x
+        this.y = y
+        if (ns4) this.p.top = y
+        else this.p.pixelTop = y
+}
+function pointerMoveBy(x,y) { this.moveto(this.x+x, this.y+y) }
+function pointerGetClip(corner) {
+        if (ns4) {
+                if (corner == "t") return this.p.clip.top
+                else if (corner == "r") return this.p.clip.right
+                else if (corner == "b") return this.p.clip.bottom
+                else if (corner == "l") return this.p.clip.left
+        }
+        else if (ie4) {
+                var temp = this.p.clip.split("rect(")[1].split(")")[0].split("px")
+                if (corner == "t") return Number(temp[0])
+                else if (corner == "r") return Number(temp[1])
+                else if (corner == "b") return Number(temp[2])
+                else if (corner == "l") return Number(temp[3])
+        }
+}
+function pointerClipTo(t,r,b,l) {
+        if (ie4) this.p.clip = "rect("+t+"px "+r+"px "+b+"px "+l+"px)" 
+        else if (ns4) {
+                this.p.clip.top = t
+                this.p.clip.right = r
+                this.p.clip.bottom = b
+                this.p.clip.left = l
+        }
+}
+function pointerScrollUp(y,speed) {
+        if (move) {
+			if (this.y <= y) {
+        	        this.moveby(0,0.4)
+            	    setTimeout(this.obj+".s_up("+y+","+speed+")",speed)
+        	}
+		}
+}		
+function pointerScrollDown(y,speed) {		
+ 		if (move) {
+       		 if (this.y >= y) {
+    	         this.moveby(0,-0.4)
+        	     setTimeout(this.obj+".s_down("+y+","+speed+")",speed)
+        	}
+     	}
+}
+function pointerShow() {
+	if (ns4) this.p.visibility = "show"
+	else this.p.visibility = "visible"
+}
+
+function showobj(which) {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// var obj = eval("document." + coll + "calltext" + which + styleObj);
+	// obj.visibility = "visible";
+}
+
+function hideall() {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// for (i=1;i<=menuitems;i++) {
+	// 	var obj = eval("document." + coll + "calltext" + i + styleObj);
+	// 	obj.visibility="hidden";
+	// }
+}
+// end hide -->
+
+</script>
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td><img src="bionicle/images/printhead183x41.gif" width="183" height="41" border="0"><br><br></td>
+	</tr>
+	<tr>
+		<td><font face="verdana, helvetica" size="2"><b>Welcome to the island of Mata Nui</font><br>
+    		<font face="verdana, helvetica" size="1">A world full of mystery and danger, wonder and legend.</b>
+    		<br><br>
+    		 Every so often, a new area of the island will open up for you to explore. For example, at the beginning of January only one beach was accessible, because a lava flow had cut it off from the rest of the island. But by February, the lava had cooled, opening the way to the village of Ta-Koro.<br><br>
+
+			If you visit Bionicle.com regularly, you will eventually see an announcement on the homepage about a new area of the island.<br><br>
+
+			Exploring the island of Mata Nui is very different from a traditional video game. There are many places to explore and secrets to uncover, and you may need to solve puzzles or perform tasks to reach certain locations.
+			There is no single, clear goal for you to accomplish -- finding your true purpose is up to you, and it may or may not be possible to "win the game."<br><br>
+
+			To journey across Mata Nui, move your mouse across the scene before you. As your mouse reaches the left or right edge of the scene, it will shift in that direction, just as if you were turning your head. In some locations you can look up and down as well.<br><br>
+
+			Normally your mouse cursor will look like an arrow.<br><br><br>
+			If you see your cursor change to a pointing finger, you can click to move forward, or inspect a particular object. There are many strange devices on Mata Nui; clicking on
+			some of them may cause interesting effects.<br><br>
+
+			If you see a symbol that looks like this , you can click to turn all the way around, and face the opposite direction. You can use this feature to retrace your steps, and return the way you came.<br><br>
+
+			If you meet one of the inhabitants of Mata Nui, you may be able to talk to them by clicking. Some of the island-dwellers have very little to say, but others will start a conversation with you. When you see a screen with a set of questions, click on one of them to continue the dialogue. You could learn very useful information from talking to the island's inhabitants...<br><br>
+			<br><br>
+			<br><br>
+			<hr>
+			<font face="verdana, helvetica" size="2"><b>About This Site</b></font><br><br>
+
+			<font face="verdana, helvetica" size="1">LEGO TECHNIC Bionicle is a totally new concept where storytelling is in focus. Children can learn about the universe and follow the development of the story on www.Bionicle.com.<br><br>
+
+			The story begins at the island of Mata Nui, where the six Toa heroes with destiny and the six Turaga priests are the main characters. The six Toa will be released in Europe in February and in the States in August.<br><br>
+
+			©2001 The LEGO Group. All rights reserved. Use of this site signifies your agreement to the terms of use.<br><br>
+
+			TM and ® indicate trademarks of the LEGO Company.<br><br>
+
+			<a href="javascript:void(0);" data-href="http://www.lego.com/info/privacypolicy.asp" target="parent">Privacy Policy</a><br><br> 
+
+			<a href="javascript:void(0);" data-href="http://www.lego.com/info/printfairplay.asp" target="parent">Legal Notice</a><br><br>
+
+			Storysite Design and Technical Production by Templar Studios, LLC.</font>
+</td>
+	</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Question1=Sail+to+Po-Koro&Question2=Stay+here&Question3=Sail+to+Ta-Wahi&MovieName1=Episode_3-1.swf&VerticalShift1=0&HorizontalShift1=1&ShiftOff1=0&MovieName3=Episode_3-1.swf&VerticalShift3=0&HorizontalShift3=2&ShiftOff3=0&TextIsLoaded=1&MovieName2=V.1-S.swf&VerticalShift2=0&HorizontalShift2=1&ShiftOff2=0&AskMe=Where+would+you+like+to+go?

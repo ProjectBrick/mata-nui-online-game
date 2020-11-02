@@ -1,0 +1,1 @@
+Question1=Ja.&Question2=Nein.&MovieName1=XI.CrabRide1.swf&VerticalShift1=0&HorizontalShift1=1&ShiftOff1=1&TextIsLoaded=1&MovieName2=XI.1-N.swf&VerticalShift2=0&HorizontalShift2=1&ShiftOff2=0&AskMe=Willst+du+den+Krebs+reiten?&Music_ChangeMusic=1&Music_Movie=blank.swf&

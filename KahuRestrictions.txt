@@ -1,0 +1,1 @@
+NumScreen=18&Screen1=X.7-N.swf&Screen2=X.7-S.swf&Screen3=X.8-N.swf&Screen4=X.8-S.swf&Screen5=X.9-N.swf&Screen6=X.9-S.swf&Screen7=X.10-N.swf&Screen8=X.10-S.swf&Screen9=X.11-N.swf&Screen10=X.11-S.swf&Screen11=X.12-N.swf&Screen12=X.12-S.swf&Screen13=IX.5-N.swf&Screen14=IX.5-S.swf&Screen15=IX.6-N.swf&Screen16=IV.2-N.swf&Screen17=IV.3-W.swf&Screen18=IV.7-E.swf&

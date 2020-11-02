@@ -1,0 +1,4 @@
+OpenStatementNum=1&OpenStatement1=Stay+away+from+me!&OpenStatement2=I+sure+could+use+some+more+teammates+to+play+with.+All+the+others+have+gone+home.+They're+not+feeling+well.+Not+even+Huki+can+play+anymore.&OpenStatement3=And+I+just+got+a+new+Comet!+Traded+two+Husi+for+it.&
+
+
+&Exit_Section=3&Exit_Segment=1&MovieName=IX.4-E.swf&VerticalShift=0&HorizontalShift=1&ShiftOff=0&TextIsLoaded=1&

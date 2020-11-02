@@ -1,0 +1,301 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+
+
+<style type="text/css">
+#newsclipd { HEIGHT: 130px; LEFT: 330px; POSITION: absolute; TOP: 165px; WIDTH: 395px; Z-INDEX: 3; }
+#newsd { LEFT: 0px; POSITION: absolute; TOP: 0px; VISIBILITY: hidden; WIDTH: 395px; Z-INDEX: 2; }
+#respect { HEIGHT: 288px; LEFT: 425px; POSITION: absolute; TOP: 400px; WIDTH: 300px; Z-INDEX: 4; }
+</style>
+
+<script language="Javascript">
+<!-- hide
+
+ns4 = (document.layers)? 1:0
+ie4 = (document.all)? 1:0
+ie5 = (navigator.appVersion.indexOf('MSIE 5')>0)? 1:0
+
+var isNav,isIE,coll,styleObj;
+var coll = "";
+var styleObj = "";
+var menuitems = 3;
+
+if (parseInt(navigator.appVersion) >= 4) {
+	if (navigator.appName == "Netscape") {
+		isNav = true
+	} else {
+		isIE = true
+		coll = "all."
+		styleObj = ".style"
+	}
+}
+
+function WM_netscapeCssFix() {
+
+  if (document.WM.WM_netscapeCssFix.initWindowWidth != window.innerWidth || document.WM.WM_netscapeCssFix.initWindowHeight != window.innerHeight) {
+    document.location = document.location;
+  }
+}
+
+function WM_netscapeCssFixCheckIn() {
+  if (ns4) {
+    if (typeof document.WM == 'undefined'){
+      document.WM = new Object;
+    }
+    if (typeof document.WM.WM_scaleFont == 'undefined') {
+      document.WM.WM_netscapeCssFix = new Object;
+      document.WM.WM_netscapeCssFix.initWindowWidth = window.innerWidth;
+      document.WM.WM_netscapeCssFix.initWindowHeight = window.innerHeight;
+    }
+    window.onresize = WM_netscapeCssFix;
+  }
+}
+
+WM_netscapeCssFixCheckIn()
+
+function init() {
+        newsclip = new pointer("newsclipd")
+        news = new pointer("newsd", "newsclipd") 
+        newsclip.clipto(0,395,133,0)
+		news.show()
+        var windowHeight = (document.layers)? (newsclip.p.clip.bottom - newsclip.p.clip.top) : newsclip.height
+        var contentHeight = (document.layers)? news.doc.height : news.event.scrollHeight
+	if (contentHeight<=134) { hidearrows(); }
+        offsetHeight = contentHeight - windowHeight
+}
+
+function hidearrows() {
+// PATCH:
+// Not funcitonal, unclear what it would have done.
+// Disabled to prevent error.
+//   var arrow1 = eval("document." + coll + "scroller" + styleObj);
+//   var arrow2 = eval("document." + coll + "scroller1" + styleObj);
+//   arrow1.visibility = "hidden";
+//   arrow2.visibility = "hidden";
+}
+function pointer(name, path) {
+      if (ns4) {
+                if (!path) this.p = document.layers[name]       
+                else this.p = eval("document."+path+".document."+name)
+                this.elm = this.event = this.p
+
+                this.x = this.p.left
+                this.y = this.p.top
+                this.width = this.p.clip.width
+                this.height = this.p.clip.height 
+                this.doc = this.p.document
+                }
+
+        else if (ie4) {
+                this.p = document.all[name].style 
+                this.elm = this.event = document.all[name]
+                this.x = this.elm.offsetLeft
+                this.y = this.elm.offsetTop
+                if (ie5) {
+                        this.width = this.elm.offsetWidth
+                        this.height = this.elm.offsetHeight     
+                }       
+                else {
+                        this.width = this.p.pixelWidth
+                        this.height = this.p.pixelHeight
+                        
+                }
+        }
+
+      this.name = name
+        this.obj = name + "pointer"
+        eval (this.obj+"=this")
+        this.moveto = pointerMoveTo
+        this.moveby = pointerMoveBy
+		this.s_up = pointerScrollUp 
+		this.s_down = pointerScrollDown
+        this.clipto = pointerClipTo
+        this.getclip = pointerGetClip
+		this.show = pointerShow
+}
+
+function scrollup() {
+         		move = 1
+				news.s_up(0, 1)
+		 	}
+function scrolldown() {
+				move = 1
+		 		news.s_down(-offsetHeight, 1)
+		 }
+function scrollstop() { move = 0; }
+
+function pointerMoveTo(x,y) {
+        this.x = x
+        if (ns4) this.p.left = x
+        else this.p.pixelLeft = x
+        this.y = y
+        if (ns4) this.p.top = y
+        else this.p.pixelTop = y
+}
+function pointerMoveBy(x,y) { this.moveto(this.x+x, this.y+y) }
+function pointerGetClip(corner) {
+        if (ns4) {
+                if (corner == "t") return this.p.clip.top
+                else if (corner == "r") return this.p.clip.right
+                else if (corner == "b") return this.p.clip.bottom
+                else if (corner == "l") return this.p.clip.left
+        }
+        else if (ie4) {
+                var temp = this.p.clip.split("rect(")[1].split(")")[0].split("px")
+                if (corner == "t") return Number(temp[0])
+                else if (corner == "r") return Number(temp[1])
+                else if (corner == "b") return Number(temp[2])
+                else if (corner == "l") return Number(temp[3])
+        }
+}
+function pointerClipTo(t,r,b,l) {
+        if (ie4) this.p.clip = "rect("+t+"px "+r+"px "+b+"px "+l+"px)" 
+        else if (ns4) {
+                this.p.clip.top = t
+                this.p.clip.right = r
+                this.p.clip.bottom = b
+                this.p.clip.left = l
+        }
+}
+function pointerScrollUp(y,speed) {
+        if (move) {
+			if (this.y <= y) {
+        	        this.moveby(0,0.4)
+            	    setTimeout(this.obj+".s_up("+y+","+speed+")",speed)
+        	}
+		}
+}		
+function pointerScrollDown(y,speed) {		
+ 		if (move) {
+       		 if (this.y >= y) {
+    	         this.moveby(0,-0.4)
+        	     setTimeout(this.obj+".s_down("+y+","+speed+")",speed)
+        	}
+     	}
+}
+function pointerShow() {
+	if (ns4) this.p.visibility = "show"
+	else this.p.visibility = "visible"
+}
+
+function showobj(which) {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// var obj = eval("document." + coll + "calltext" + which + styleObj);
+	// obj.visibility = "visible";
+}
+
+function hideall() {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// for (i=1;i<=menuitems;i++) {
+	// 	var obj = eval("document." + coll + "calltext" + i + styleObj);
+	// 	obj.visibility="hidden";
+	// }
+}
+// end hide -->
+
+</script>
+
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0" width="525">
+
+	<tr>
+		<td>
+		
+		<a href="supportprint_4.html" target="_new"><img src="bionicle/images/und143x28us0printable.gif" width="143" height="28" border="0"></a>		
+		
+		</td>
+	</tr>
+
+	<tr>
+		<td><font face="verdana, helvetica" size="2"><b>Nestl&eacute; Sponsored LEGO Bionicle CD-Rom</b><br>(Only available in Europe)</font><br><br>
+
+			<font face="verdana, helvetica" size="1"><b>SYSTEM REQUIREMENTS AND COMPATIBLITY</b><br><br>
+
+			<b>What are the minimum system requirements for the Nestl&eacute; sponsored LEGO Bionicle?</b><br>
+			100% WINDOWS (R) 95/98/ Millennium DirectX (TM) 7 Compatible Computer required.<br>
+			CPU: PENTIUM (R) MMX(TM) 166MHz or equivalent.<br>
+			MEMORY: 32 MB RAM or higher required.<br>
+			VIDEO: 4MB DirectX (TM) Compatible Video Card.<br>
+			CD-ROM: 4X or faster CD-ROM/DVD drive required.<br>
+			SOUND CARD: 100% WINDOWS (R) 95/98/ Millennium DirectX (TM) (DirectSound) compatible sound<br><br>
+
+			<b>Will the Nestl&eacute; sponsored LEGO Bionicle work with Windows 2000, Windows NT, Macintosh, or Linux operating systems?</b><br>
+			LEGO Bionicle has been tested and is supported on the Windows 95, Windows 98 & Windows Millennium platforms. We have not tested LEGO Bionicle on Windows 2000, Windows NT, Macintosh or Linux and therefore we are not able to provide technical support for these platforms.<br><br> 
+
+			<b>My computer is just under the minimum system requirements should I try the Nestl&eacute; sponsored LEGO Bionicle anyway?</b>
+			No. LEGO Bionicle minimum system requirements were tested extensively before the release of the product. We do not recommend the use of LEGO Bionicle software on a system below the minimum system requirements.<br><br> 
+
+			<b>IDENTIFICATION</b><br><br>
+
+			<b>I heard that there are two versions of the Nestl&eacute; sponsored LEGO Bionicle CD that comes with Nestl&eacute; Products. They both look the same, how can I tell if I have collected both versions?</b>
+			Look at the middle ring of the CD, one version has a white background and the other has a black background.<br><br>
+
+			<b>What is the difference between the two Nestl&eacute; sponsored LEGO Bionicle CDs?</b><br>
+			Nothing, both the Nestl&eacute; sponsored LEGO Bionicle CD-ROMs contain the same programs. However, obtaining the other the Nestl&eacute; sponsored LEGO Bionicle CD-ROM gives you extra levels in the full game.<br><br> 
+
+			<b>NAVIGATION</b><br><br>
+			<img src="bionicle/images/game.jpg" align="left"></img>
+			<b>How do I get access to the full game?</b><br>
+			Complete all 6 Turaga challenges and the full game button will be displayed in the middle of the bottom edge of the Turaga menu. Click this button to enter the full game.<br><br>
+
+			<b>I have both the Nestl&eacute; sponsored LEGO Bionicle CD versions, what do I do to get the extra levels?</b><br>
+			Just put the 2nd version into your CD ROM drive, a voice over will inform you that you now have access to the new game levels.<br><br>
+
+			<b>LOADING</b><br><br>
+			
+			<b>I insert my CD into my CD ROM drive and nothing happens, what do I do?</b><br>
+			Your CD ROM drive might not be set to Autorun.<br>
+			Open windows explorer<br>
+			Select your CD ROM drive letter, in most cases this will be D:<br>
+			Double click on setup.exe.<br>
+			This will start the Bionicle installation program.<br><br> 
+
+			<b>My computer cannot read my CD.</b><br>
+			The CD-ROM drive reads the CD with an optical laser. If there are any dust particles, smudges or fingerprints on the silver side of the CD the CD-ROM drive may have difficulty reading the CD. This difficulty can result in error messages, lock ups and blue screens. To clean the CD, use warm soapy water and a soft cloth towel. Only wipe the CD from the inside out like the spokes on a wheel with a soft lint free cloth. Make sure the CD is completely dry before using it in the computer.<br><br>
+
+			<b>Why do QuickTime, Direct X and Macromedia Flash have to be installed?</b><br>
+			In order to view the movies you will have to have QuickTime installed. Many of the LEGO programs use the DirectX components to manage sound and video within the program. If you are experiencing choppy sound or broken or choppy video please review your settings with the DirectX diagnostics tool. Guidance on how to do this can be found under DIRECT X in the General Troubleshooting Section. To be able to access the Barcode Brothers section you will have to have <a href="javascript:void(0);" data-href="http://www.macromedia.com/software/flash/download/" target="top">Macromedia Flash</a> installed.<br><br>
+			<img src="bionicle/images/mainscreen.jpg" align="right"></img>
+			<b>How do I install and activate my LEGO Bionicle Screensaver?</b>
+			Open windows explorer and select your CD ROM drive.<br>
+			Click on the folder named Screensaver.<br>
+			Double-click on setup.exe in this folder.<br>
+			Follow the installation instructions.<br>
+			To activate the screensaver:<br>
+			Open control panel and select display properties.<br>
+			Click on the tab named screensaver.<br>
+			Select the screensaver named LEGO Bionicle from the list.<br>
+			Click on the apply button.<br>
+			Your Bionicle screensaver will now be active.<br><br>
+
+			<b>How do I install my LEGO Bionicle Wallpaper?</b><br>
+			Open windows explorer and select your CD ROM drive.<br>
+			Click on the folder named Wallpaper.<br>
+			Open this folder, and choose which image you would like to display.<br>
+			Copy this image to your windows directory<br> 
+			You will now be able to choose this image for your Desktop Wallpaper<br>
+			Follow the manufacturers procedures for changing your wallpaper.<br><br>
+
+			<b>ERRORS</b><br><br>
+
+			<b>I get a memory allocation error upon launching the game, what do I do?</b><br>
+			This message is because your graphic card does not currently have sufficient memory to launch the game. With this product you need at least a 4MB Graphics card to run the game. Please check your System Specification and ensure your system meets the Minimum Requirements. <br><br>
+
+			<b>Sometimes my Nestl&eacute; sponsored LEGO Bionicle program freezes, what can I do?</b><br><br>
+			First you should ensure that your computer meets the minimum specifications. Then ensure you have no other programs running in the background. Help on how to do this can be found in the section Close Programs in Background, which is found under <a href="supportframe_5.html" target="_top">General Troubleshooting.</a></font></td>
+	</tr>
+
+</table>
+
+
+</body>
+</html>

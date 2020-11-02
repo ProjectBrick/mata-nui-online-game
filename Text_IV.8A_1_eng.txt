@@ -1,0 +1,1 @@
+Question1=Yes&Question2=No&MovieName1=Episode_7-1.swf&VerticalShift1=0&HorizontalShift1=1&ShiftOff1=1&TextIsLoaded=1&MovieName2=IV.8-N.swf&VerticalShift2=0&HorizontalShift2=1&ShiftOff2=0&AskMe=Ride+to+Ko-Koro?&Music_ChangeMusic1=1&Music_Movie1=blank.swf&Sound_ChangeBackgroundMovie1=1&Sound_Background1=blank.swf&Sound_ChangeSFXMovie1=1&Sound_SFXMovie1=blank.swf&

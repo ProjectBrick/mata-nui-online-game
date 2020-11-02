@@ -1,0 +1,133 @@
+BODY
+{
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px
+}
+TD
+{
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px
+}
+TH
+{
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px
+}
+.error
+{
+    COLOR: red;
+    FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px
+}
+.texthdr
+{
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px;
+    FONT-WEIGHT: bolder
+}
+.topnav
+{
+    FLOAT: none;
+    FONT-SIZE: 10px;
+    LEFT: 0pt;
+    POSITION: absolute;
+    TOP: 0pt
+}
+.bottomnav
+{
+    COLOR: black;
+    FONT-SIZE: 10px
+}
+.topnav_legofinder
+{
+    FONT-SIZE: 10px;
+    HEIGHT: 16px
+}
+.topnav_searchbox
+{
+    FONT-SIZE: 10px;
+    HEIGHT: 16px
+}
+.topnav_breadcrumbwhite
+{
+    COLOR: #ffffff;
+    FONT-SIZE: 10px;
+    TEXT-DECORATION: none
+}
+.topnav_breadcrumbblack
+{
+    COLOR: #000000;
+    FONT-SIZE: 10px;
+    TEXT-DECORATION: none
+}
+.sidenav_formfield
+{
+    FONT-SIZE: 12px;
+    HEIGHT: 18px;
+    WIDTH: 100px
+}
+.formfield
+{
+    FONT-SIZE: 12px;
+    HEIGHT: 18px;
+    WIDTH: 150px
+}
+#cartpreview
+{
+    LEFT: 410px;
+    POSITION: absolute;
+    TOP: 50px;
+    VISIBILITY: hidden;
+    WIDTH: 260px
+}
+#cartpreviewlist
+{
+    CLIP: rect(0px 205px 46px 0px);
+    HEIGHT: 46px;
+    LEFT: 430px;
+    POSITION: absolute;
+    TOP: 96px;
+    VISIBILITY: hidden;
+    WIDTH: 205px
+}
+#wishpreview
+{
+    LEFT: 325px;
+    POSITION: absolute;
+    TOP: 50px;
+    VISIBILITY: hidden;
+    WIDTH: 260px
+}
+#wishpreviewlist
+{
+    CLIP: rect(0px 205px 46px 0px);
+    HEIGHT: 46px;
+    LEFT: 345px;
+    POSITION: absolute;
+    TOP: 96px;
+    VISIBILITY: hidden;
+    WIDTH: 205px
+}
+#button_wish_control
+{
+    VISIBILITY: hidden
+}
+#button_basket_control
+{
+    VISIBILITY: hidden
+}
+#app_move
+{
+    CLIP: rect(0px 255px 46px 0px);
+    LEFT: 0px;
+    POSITION: absolute;
+    TOP: 0px;
+    VISIBILITY: hidden
+}
+.shop_inpage_link
+{
+    COLOR: #0f75c1;
+    FONT-FAMILY: Arial, Helvetica, sans-serif;
+    FONT-SIZE: 12px;
+    TEXT-DECORATION: underline
+}

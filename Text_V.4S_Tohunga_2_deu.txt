@@ -1,0 +1,1 @@
+NumStatements=3&Statement_1=Danke!+Du+hast+unser+Dorf+gerettet,+Freund!&Statement_2=Nach+dem+Angriff+der+Rahi,+gibt+es+viele+Aufräum+und+Instandsetzungsarbeiten+in+Ga-Koro.&Statement_3=Nokama+sucht+nach+dir,+sie+möchte+das+du+etwas+wichtiges+für+sie+tust.

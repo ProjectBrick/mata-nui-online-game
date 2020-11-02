@@ -1,0 +1,618 @@
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<link REL="SHORTCUT ICON" HREF="favicon.ico">
+
+
+<style type="text/css">
+#newsclipd { HEIGHT: 130px; LEFT: 330px; POSITION: absolute; TOP: 165px; WIDTH: 395px; Z-INDEX: 3; }
+#newsd { LEFT: 0px; POSITION: absolute; TOP: 0px; VISIBILITY: hidden; WIDTH: 395px; Z-INDEX: 2; }
+#respect { HEIGHT: 288px; LEFT: 425px; POSITION: absolute; TOP: 400px; WIDTH: 300px; Z-INDEX: 4; }
+</style>
+
+<script language="Javascript">
+<!-- hide
+
+ns4 = (document.layers)? 1:0
+ie4 = (document.all)? 1:0
+ie5 = (navigator.appVersion.indexOf('MSIE 5')>0)? 1:0
+
+var isNav,isIE,coll,styleObj;
+var coll = "";
+var styleObj = "";
+var menuitems = 3;
+
+if (parseInt(navigator.appVersion) >= 4) {
+	if (navigator.appName == "Netscape") {
+		isNav = true
+	} else {
+		isIE = true
+		coll = "all."
+		styleObj = ".style"
+	}
+}
+
+function WM_netscapeCssFix() {
+
+  if (document.WM.WM_netscapeCssFix.initWindowWidth != window.innerWidth || document.WM.WM_netscapeCssFix.initWindowHeight != window.innerHeight) {
+    document.location = document.location;
+  }
+}
+
+function WM_netscapeCssFixCheckIn() {
+  if (ns4) {
+    if (typeof document.WM == 'undefined'){
+      document.WM = new Object;
+    }
+    if (typeof document.WM.WM_scaleFont == 'undefined') {
+      document.WM.WM_netscapeCssFix = new Object;
+      document.WM.WM_netscapeCssFix.initWindowWidth = window.innerWidth;
+      document.WM.WM_netscapeCssFix.initWindowHeight = window.innerHeight;
+    }
+    window.onresize = WM_netscapeCssFix;
+  }
+}
+
+WM_netscapeCssFixCheckIn()
+
+function init() {
+        newsclip = new pointer("newsclipd")
+        news = new pointer("newsd", "newsclipd") 
+        newsclip.clipto(0,395,133,0)
+		news.show()
+        var windowHeight = (document.layers)? (newsclip.p.clip.bottom - newsclip.p.clip.top) : newsclip.height
+        var contentHeight = (document.layers)? news.doc.height : news.event.scrollHeight
+	if (contentHeight<=134) { hidearrows(); }
+        offsetHeight = contentHeight - windowHeight
+}
+
+function hidearrows() {
+// PATCH:
+// Not funcitonal, unclear what it would have done.
+// Disabled to prevent error.
+//   var arrow1 = eval("document." + coll + "scroller" + styleObj);
+//   var arrow2 = eval("document." + coll + "scroller1" + styleObj);
+//   arrow1.visibility = "hidden";
+//   arrow2.visibility = "hidden";
+}
+function pointer(name, path) {
+      if (ns4) {
+                if (!path) this.p = document.layers[name]       
+                else this.p = eval("document."+path+".document."+name)
+                this.elm = this.event = this.p
+
+                this.x = this.p.left
+                this.y = this.p.top
+                this.width = this.p.clip.width
+                this.height = this.p.clip.height 
+                this.doc = this.p.document
+                }
+
+        else if (ie4) {
+                this.p = document.all[name].style 
+                this.elm = this.event = document.all[name]
+                this.x = this.elm.offsetLeft
+                this.y = this.elm.offsetTop
+                if (ie5) {
+                        this.width = this.elm.offsetWidth
+                        this.height = this.elm.offsetHeight     
+                }       
+                else {
+                        this.width = this.p.pixelWidth
+                        this.height = this.p.pixelHeight
+                        
+                }
+        }
+
+      this.name = name
+        this.obj = name + "pointer"
+        eval (this.obj+"=this")
+        this.moveto = pointerMoveTo
+        this.moveby = pointerMoveBy
+		this.s_up = pointerScrollUp 
+		this.s_down = pointerScrollDown
+        this.clipto = pointerClipTo
+        this.getclip = pointerGetClip
+		this.show = pointerShow
+}
+
+function scrollup() {
+         		move = 1
+				news.s_up(0, 1)
+		 	}
+function scrolldown() {
+				move = 1
+		 		news.s_down(-offsetHeight, 1)
+		 }
+function scrollstop() { move = 0; }
+
+function pointerMoveTo(x,y) {
+        this.x = x
+        if (ns4) this.p.left = x
+        else this.p.pixelLeft = x
+        this.y = y
+        if (ns4) this.p.top = y
+        else this.p.pixelTop = y
+}
+function pointerMoveBy(x,y) { this.moveto(this.x+x, this.y+y) }
+function pointerGetClip(corner) {
+        if (ns4) {
+                if (corner == "t") return this.p.clip.top
+                else if (corner == "r") return this.p.clip.right
+                else if (corner == "b") return this.p.clip.bottom
+                else if (corner == "l") return this.p.clip.left
+        }
+        else if (ie4) {
+                var temp = this.p.clip.split("rect(")[1].split(")")[0].split("px")
+                if (corner == "t") return Number(temp[0])
+                else if (corner == "r") return Number(temp[1])
+                else if (corner == "b") return Number(temp[2])
+                else if (corner == "l") return Number(temp[3])
+        }
+}
+function pointerClipTo(t,r,b,l) {
+        if (ie4) this.p.clip = "rect("+t+"px "+r+"px "+b+"px "+l+"px)" 
+        else if (ns4) {
+                this.p.clip.top = t
+                this.p.clip.right = r
+                this.p.clip.bottom = b
+                this.p.clip.left = l
+        }
+}
+function pointerScrollUp(y,speed) {
+        if (move) {
+			if (this.y <= y) {
+        	        this.moveby(0,0.4)
+            	    setTimeout(this.obj+".s_up("+y+","+speed+")",speed)
+        	}
+		}
+}		
+function pointerScrollDown(y,speed) {		
+ 		if (move) {
+       		 if (this.y >= y) {
+    	         this.moveby(0,-0.4)
+        	     setTimeout(this.obj+".s_down("+y+","+speed+")",speed)
+        	}
+     	}
+}
+function pointerShow() {
+	if (ns4) this.p.visibility = "show"
+	else this.p.visibility = "visible"
+}
+
+function showobj(which) {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// var obj = eval("document." + coll + "calltext" + which + styleObj);
+	// obj.visibility = "visible";
+}
+
+function hideall() {
+	// PATCH:
+	// Not funcitonal, unclear what it would have done.
+	// Disabled to prevent error.
+	// for (i=1;i<=menuitems;i++) {
+	// 	var obj = eval("document." + coll + "calltext" + i + styleObj);
+	// 	obj.visibility="hidden";
+	// }
+}
+// end hide -->
+
+</script>
+
+
+
+</head>
+<body bgcolor="#FFFFFF">
+<table cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td><img src="bionicle/images/printhead183x41.gif" width="183" height="41" border="0"><br><br></td>
+	</tr>
+	<tr>
+		<td><font face="verdana, helvetica" size="2"><b>Mata Nui - Tips and Tricks</b></font><br><br>
+    		<font face="verdana, helvetica" size="1">Sometimes the mysteries of Mata Nui can be difficult to unravel. That's why the Bionicle team has put together some hints to help you find your way around the island. Click on the section where you're having trouble and you'll see a list of questions. If you find the question that applies to your problem, click on it. If you click once you'll receive a hint, click again and you may receive another hint. Each question may have several tips to help you along. Good luck!<br><br>
+
+<b>On the Beach</b><br>
+  Q. What&#39;s that big canister doing there?<br>
+  - Looks like somebody came out of it and walked away.<br>
+  - Maybe you should follow the footprints?<br>
+  - This is where Tahu arrived on Mata Nui. He headed towards the Burnt Forest. If you have the Storybook, you can see what happened next...<br>
+<br>
+  Q. How can I get into the big stone face on the beach?<br>
+  - Hmm, it looks like you should be able to get in there, doesn&#39;t it?<br>
+  - But you can&#39;t. Not right now, at any rate... the stone faces are a great mystery.<br>
+<br>
+  Q. What was that strange movie with all the stones falling from the sky?<br>
+  - That was the Legend of Mata Nui, which is told using stones across the island.<br>
+  - Perhaps one of the Turaga can tell you more.<br>
+  - You can also learn more about the Legend on one of the Bionicle CD-ROMs.<br>
+<br>
+  Q. What is the green gem on the hook for, the one at the edge of the cliff?<br>
+  - Have you tried clicking on the gem?<br>
+  - Have you tried clicking on the pedestal underneath the hook?<br>
+  - There is someone in the village of Ga-Koro who knows more about these things.<br>
+  - The green gem is a telescope of sorts, that lets you see the starry sky above Mata Nui.<br>
+  - The pedestal shows scenes from the prophecies kept by the Turaga, and each scene is connected to a certain constellation in the sky.<br>
+  - &#34;When the Red Star is exactly where it is shown in one of the pictures, then a prophecy may come true.&#34;<br>
+<br>
+  Q. There&#39;s someone here with a boat, waving at me and asking me for help!<br>
+  - Maybe you should talk to her.<br>
+  - Maybe you should agree to help her?<br>
+  - If you agree to help Maku, you will be journey to Ga-Koro automatically. You might want to hear about what happened first, though.<br>
+<br>
+
+
+<b>Ta-Koro</b><br>
+  Q. How do I get across the big lava pit?<br>
+  - That&#39;s the village of Ta-Koro over there. The guards and other travelers must have some way of getting back inside.<br>
+  - You might want to check around the gate area, where the guards are patrolling.<br>
+  - There&#39;s a staircase on one side of the archway where the guards are.<br>
+  - In the guardhouse up the stairs, you can talk to Jala, Captain of the Guard. But there&#39;s another room behind him.<br>
+  - In the room behind Jala, click on the big machine and watch it work.<br>
+<br>
+  Q. Why can&#39;t I go into the rooms in the back?<br>
+  - Those are private dwellings of the Ta-Koro Tohunga. I don&#39;t think they&#39;d want you in there.<br>
+  - You might want to talk to Vakama, Turaga of Ta-Koro, for more information.<br>
+  - The Tohunga of Ta-Koro don&#39;t seem to like you for some reason!<br>
+<br>
+  Q. Why can&#39;t I use the cablecar at the top of the cliff stairs?<br>
+  - It&#39;s broken.<br>
+<br>
+  Q. I&#39;m lost in the forest.<br>
+  - Forests are dark and confusing places, but maybe you can keep track of where you&#39;re going.<br>
+  - You don&#39;t have anything with you that you could use, but there are plenty of trees around.<br>
+  - If you click on a tree, you&#39;ll make a marking there.<br>
+  - Use the markings to keep track of which paths you&#39;ve already gone down. Eventually you&#39;ll find your way out.<br>
+<br>
+  Q. What is there to find in the forest?<br>
+  - Lots and lots of blackened trees.<br>
+  - You might run across someone else wandering in there.<br>
+  - Kapura is practicing in the forest. There&#39;s nothing else to find there for now.<br>
+<br>
+
+
+<b>Ga-Koro</b><br>
+  Q. The gate is closed, how do I get in?<br>
+  - This gate looks kind of complicated. Maybe there&#39;s some way to open it from outside?<br>
+  - There&#39;s a big shell hanging to the right of the gate, and a bunch of stones on the ground.<br>
+  - Try putting the stones in the shell.<br>
+  - Look carefully at what happens to the gate when you put a stone in the shell.<br>
+  - The dial at the top of the gate moves.<br>
+  - Put just enough stones in the shell to get the two blue dots on the dial to line up. The larger stones will move the dial further than the smaller stones.<br>
+<br>
+  Q. Where are all the villagers?<br>
+  - Have you looked in all the houses?<br>
+  - Have you looked underwater?<br>
+  - If you go underwater, you can see a submerged hut.<br>
+  - The villagers and their Turaga, Nokama, are trapped in that hut.<br>
+  - You can&#39;t talk to them from down there, you&#39;ll have to find a different way.<br>
+<br>
+  Q. How do I rescue the villagers?<br>
+  - You&#39;re a visitor to this village, but maybe one of the villagers knows what to do.<br>
+  - All the villagers are trapped underwater. You&#39;ll have to figure out how to talk with them.<br>
+  - There&#39;s a lily pad with a strange machine, just to the left of the hut that leads you underwater.<br>
+  - If you go to this lily pad, there&#39;s a little tube at the left edge.<br>
+  - If you click on the tube, you can talk with Nokama, who has some ideas on what to do.<br>
+<br>
+  Q. How do I repair the machine?<br>
+  - Try pressing the button!<br>
+  - Oops, nothing happened. Looks like something&#39;s missing in the middle there.<br>
+  - You need to find the missing gear. If it&#39;s not on the machine, maybe it fell...<br>
+  - ... into the water. It&#39;s on the ocean floor somewhere.<br>
+  - It&#39;s pretty dark down there, but Nokama might be able to help you.<br>
+  - You need Nokama&#39;s lightstone, which is in one of the huts. It will illuminate the darkness underwater.<br>
+  - Once you&#39;ve found the missing gear, put it in the machine and press the button!<br>
+<br>
+  Q. I can&#39;t pick up the lightstone.<br>
+  - It&#39;s much easier to carry stuff when you have something to carry it in.<br>
+  - Look around the village.<br>
+  - There&#39;s a backpack in the hut that leads underwater. Once you have the backpack you can pick up the lightstone -- not to mention other stuff you might need.<br>
+<br>
+  Q. I know what I&#39;m supposed to do underwater, but how do I find it?<br>
+  - Gears are much shinier than ocean-dwelling plants and animals.<br>
+  - Try dragging the lightstone along the ocean floor.<br>
+  - The gear has fallen into a clump of sea plants and it&#39;s hard to tell which one is the gear! Shine the lightstone on the clumps of sea plants that look like they have spokes -- eventually you&#39;ll find the gear.<br>
+  - The gear could be in any of the four underwater scenes. Try turning around, moving towards the sunken hut, or moving back towards the hole that leads to the surface.<br>
+<br>
+
+
+<b>Po-Wahi and Po-Koro</b><br>
+  Q. What do I do in the dead-end valley with all the huge statues?<br>
+  - Those statues look kind of familiar, don&#39;t they?<br>
+  - Have you tried clicking on them?<br>
+  - That slot looks like something might fit into it.<br>
+  - You need a key, better look elsewhere.<br>
+  - The statues are of the six Toa, each of which is associated with a particular element.<br>
+  - This place is called the Quarry.<br>
+<br>
+  Q. How do I get to Po-Koro?<br>
+  - From the shores, turn left at the first intersection, and turn right at the second intersection.<br>
+<br>
+  Q. What&#39;s wrong with the villagers in Po-Koro?<br>
+  - Try talking to everyone, someone might know more about what&#39;s going on.<br>
+  - There&#39;s a Koli player in the stadium that you might want to talk to.<br>
+  - Try leaving the stadium and coming back.<br>
+  - Oops, he left his Koli ball behind...<br>
+  - Something&#39;s very strange about that ball. You might want to show it to Onewa.<br>
+  - For that matter, you might want to find out where that ball came from.<br>
+<br>
+  Q. Where do Comet Koli balls come from?<br>
+  - Well, there&#39;s a big marketplace in the middle of Po-Koro.<br>
+  - Maybe someone&#39;s selling them.<br>
+  - Talk to the merchant just to the right of the gate when you come into Po-Koro.<br>
+  - Hmm, he won&#39;t tell you where he got them from. Maybe there&#39;s another clue around?<br>
+  - Look near his stand for clues.<br>
+  - There&#39;s an object just to the right of his stand, on the ground. It&#39;s not a Koli ball.<br>
+  - Have you seen anywhere that this might fit into?<br>
+  - It&#39;s a key for one of the statues in the quarry.<br>
+<br>
+  Q. How do I get to the Quarry?<br>
+  - From Po-Koro, turn left at the first intersection, and turn left again at the second intersection.<br>
+  - From the shores, turn right at the first intersection.<br>
+<br>
+  Q. How do I know which statue in the Quarry is the right one?<br>
+  - If you have the key, there is a symbol on it.<br>
+  - This symbol corresponds to one of the six elements: earth, stone, water, air, fire, or ice.<br>
+  - The six elements correspond to the six Toa.<br>
+  - The statues are of the Great Masks of Power that belong to each of the six Toa.<br>
+  - If you&#39;re not sure which Mask goes with which Toa or which Toa goes with which element, look  at www.lego.com/bionicle/toa.asp.<br>
+<br>
+  Q. I&#39;ve entered the secret chamber and there&#39;s an angry Nui Jaga in there! What do I do?<br>
+  - Did you see Pohatu? What did he say?<br>
+  - Try to knock down the Rahi&#39;s nest with stones.<br>
+  - Click on a stone, drag it until you get to supporting trunk and fire!<br>
+  - Knock down all of the Rahi&#39;s support and escape with Pohatu.<br>
+<br>
+  Q. I&#39;ve returned to Po-Koro and everyone seems better. Now what?<br>
+  - Have you talked to Onewa?<br>
+  - He should give you a gift.<br>
+  - Take the chisel back to Ga-Koro.<br>
+  - Give the chisel to one of Ga-Koro&#39;s residents.<br>
+  - You should receive another gift in exchange for the chisel from Nokama.<br>
+  - The new gift is an episode book with movies from all seven stories.<br>
+<br>
+
+
+<b>Onu-Koro</b><br>
+  Q. I&#39;m at the entrance to the cave and there are some strange creatures there. What do I do?<br>
+  - Have you talked to the crab driver?<br>
+  - Take his suggestion and ride the crab.<br>
+<br>
+  Q. I just got off the crab ride into the underground tunnels. Where do I go?<br>
+  - Try talking to some of the locals.<br>
+  - Try the hut on the left.<br>
+  - Talk to Onepu. What does he tell you?<br>
+<br>
+  Q. I&#39;ve talked to Onepu. Where do I go now?<br>
+  - Talk to more villagers.<br>
+  - Try crossing the bridge.<br>
+  - Find Whenua&#39;s hut and talk to him.<br>
+  - What seems to be the problem?<br>
+<br>
+  Q. I&#39;ve talked to Onepu and Whenua, where do I go now?<br>
+  - Try crossing the bridge and venturing into the tunnels.<br>
+<br>
+  Q. I&#39;ve come to a fork in the road. Which way should I go?<br>
+  - To the right is Le-Koro, to the left is Ta-Koro. You should brush up on your Bionicle language!<br>
+  - Take the right fork towards Le-Koro.<br>
+  - Did you run into anyone?<br>
+  - Taipu is working, but its not easy without some lightstones.<br>
+  - Try going back towards Ta-Koro.<br>
+<br>
+  Q. I&#39;ve come back to the fork in the road, which way do I go?<br>
+  - This would be a lot easier if you could translate Bionicle language!<br>
+  - Go the right towards Ta-Koro.<br>
+  - Notice any extra doorways along the way?<br>
+  - Look for a doorway lit by two lanterns.<br>
+<br>
+  Q. How can I get across the lava overflow?<br>
+  - You&#39;ll need something to ride across those waves of lava.<br>
+  - Try continuing on Ta-Koro and look around the village.<br>
+  - Be sure to talk to anyone who&#39;s passing by.<br>
+  - Grab the lava surfboard from the lava surfer.<br>
+<br>
+  Q. What do I do with the lava surfboard?<br>
+  - Lava surfboards are good for surfing on lava.<br>
+  - Go back to the lava overflow and glide across!<br>
+<br>
+  Q. How do I drain the lava?<br>
+  - You need to activate the pump.<br>
+  - It needs to be turned on. It only runs when all of the lights are on.<br>
+  - If you get the pump going, the lightstone mines should be open again.<br>
+<br>
+  Q. I&#39;ve wandered back into the mines and I see an elevator. What does it do?<br>
+  - Take the elevator down and talk to the Tohunga there.<br>
+  - What does he ask you?<br>
+  - Do you know an astrologer?<br>
+  - There is an astrologer in Ga-Koro.<br>
+  - Take the Tohunga&#39;s message to Ga-Koro.<br>
+<br>
+  Q. I&#39;ve got the Tohunga&#39;s message. How do I get back to Ga-Koro?<br>
+  - Just follow the signs out of the tunnel!<br>
+  - Pass back through Onu-Koro until you get to the crabs.<br>
+  - Ride the crab back up out of the mine.<br>
+  - Pass back through the deserts of Onu-Wahi and Po-Wahi until you get to the ship.<br>
+<br>
+  Q. I&#39;m back in Ga-Koro. Where is the astrologer?<br>
+  - Try a few huts.<br>
+  - The astrologer is right next to the weaving Tohunga.<br>
+<br>
+  Q. I&#39;m back in Onu-Koro in the mine with the sundial. What do I do?<br>
+  - Go down into the chamber and use the Gnomen and one of your other tools to make it 4:00 on the sundial.<br>
+  - Your lightstone can be used as an artificial sunlight.<br>
+  - If it you leave the sundial at 4:00 for a few seconds, a secret should be revealed!<br>
+  - A Golden Tanohi mask!<br>
+<br>
+
+
+<b>Le-Koro</b><br>
+  Q. I took Taipu with me, but some creature grabbed him and now he&#39;s gone - what happened?<br>
+  - Don&#39;t worry. Taipu is ok.<br>
+  - He was captured by one of Makuta&#39;s minions - the Nui-Rama.<br>
+  - He&#39;s not hurt, but you will have to rescue him.<br>
+<br>
+  Q. I&#39;ve reached a place where there are two big pods - what do I do?<br>
+  - Notice the trees high above the pods? You need to get up there.<br>
+  - Try entering one of the pods.<br>
+  - The pod is actually an elevator. Turn the three levers to &#34;up&#34; to go to the top.<br>
+<br>
+  Q. I&#39;ve made it up to the treetops. Where should I go?<br>
+  - Look around the village. What do you see?<br>
+  - Pick up the flute lying on the ground.<br>
+  - Try and play a tune on the flute.<br>
+  - Not sure what to play? Try hitting the blue tab for a hint.<br>
+  - If you follow the pattern of the blue tab, you should meet the people of Le-Koro!<br>
+<br>
+  Q. I&#39;ve talked to a few Le-Koronans, where should I go?<br>
+  - Have you tried venturing &#34;uptree&#34;?<br>
+  - You should find Kongu asking for you to join him and battle the Nui-Rama.<br>
+  - Don&#39;t be afraid! Join Kongu against the Nui-Rama.<br>
+  - Once you&#39;re flying with Kongu, try to nail some of those Nui-Rama!<br>
+  - Can&#39;t hit them? Click your mouse to hurl a disk.<br>
+<br>
+  Q. I was flying along battling the Nui-Rama when I suddenly fell back into the jungle. What happened?<br>
+  - What did Kongu say? Maybe you should try flying with him again.<br>
+<br>
+  Q. I&#39;ve defeated the Nui-Rama and now I&#39;m in their hive, where do I go?<br>
+  - Have you looked around the entire cave, both to the left and right of Matau?<br>
+  - Try checking some of the holes in the hive.<br>
+  - Click on one of the holes on the left side of the screen right above the blue bug.<br>
+<br>
+  Q. I&#39;m back in Le-Koro and everyone is celebrating. What do I do now?<br>
+  - Did you talk to Matau? What did he say?<br>
+  - Be sure to get your gift from Matau.<br>
+  - The new flute song is used just like the other.<br>
+  - You can use the new flute song to travel all over Mata Nui…except Ko-Koro - for now….<br>
+<br>
+
+
+<b>Ko-Koro</b><br>
+  Q. How do I get to Ko-Koro?<br>
+  - Ko-koro is a snowy village high in the mountains.<br>
+  - You need to take a cable car to get there.<br>
+  - Follow the path to the right of the entrance to Ta-Koro.<br>
+  - Try the cable car at the top of the path.<br>
+  - You can&#39;t ride the cable car without a special ensign.<br>
+<br>
+  Q. I&#39;ve found the cable car, but they won&#39;t let me ride. What do I do?<br>
+  - You must visit an old friend to get the Ta-Koronan ensign you need.<br>
+  - Try one of the residents of Ta-Koro.<br>
+  - Jala has the ensign you need.<br>
+  - He is located just inside the gates to Ta-Koro on the right.<br>
+  - After getting the ensign, return to the cable car.<br>
+<br>
+  Q. I&#39;m in Ko-Koro. I don&#39;t know what to do. Help me!<br>
+  - Have you tried exploring a bit?<br>
+  - Try the small hut on the left.<br>
+  - Pick up the heatstone in the hut. You&#39;ll need it later.<br>
+  - Look outside in the snow for some footprints.<br>
+  - They will lead you to Kopeke, one of Ko-Koro&#39;s residents.<br>
+<br>
+  Q. I&#39;ve found a frozen Tohunga! How can I help him?<br>
+  - He needs to be thawed out.<br>
+  - Heat will melt the ice.<br>
+  - Heat from a heatstone would help.<br>
+  - You can get a heatstone in the cave back by the cable car.<br>
+  - Use the heat stone to thaw Kopeke out.<br>
+<br>
+  Q. I thawed out Kopeke and he ran away. What do I do?<br>
+  - Follow him!<br>
+  - Once you catch up to him, talk to him.<br>
+  - After talking to Kopeke, follow the corridor to the right towards the center of Ko-Koro.<br>
+<br>
+  Q. I&#39;ve come to a large wall with some Masks. How do I pass?<br>
+  - Use your mouse to place the masks on the wall and crack the code.<br>
+  - The masks of power must be matched with their respective noble masks.<br>
+  - Take the set of noble and power masks and match them with the right symbol.<br>
+  - Place the mask of power in the top spot and the noble mask underneath it.<br>
+  - Once all the masks are in the right place, the door to Ko-Koro will open.<br>
+<br>
+  Q. I&#39;ve passed the mask puzzle and I&#39;m in Ko-Koro. What do I do?<br>
+  - Enter Nuju&#39;s temple. It&#39;s straight ahead.<br>
+  - Talk to the Tohunga on the left.<br>
+  - He will tell you that Matoro is out on the drifts hunting Rahi.<br>
+<br>
+  Q. I&#39;ve gone down the passage to find Matoro and I can&#39;t find him. Where do I go?<br>
+  - Follow the Tohunga&#39;s advice.<br>
+  - Look for Matoro&#39;s flags in the snow.<br>
+  - Keep following them until you find the Tohungan stone with a secret message.<br>
+  - Use the Bionicle decoder to decipher the message if you dare!<br>
+  - After finding the stone, continue looking for Matoro in the drifts. Follow the red flags.<br>
+<br>
+  Q. Matoro saved me and defeated the Rahi! Now I&#39;m back in the temple. What do I do?<br>
+  - Did you try talking to some Tohunga in the temple?<br>
+  - Talk to Nuju.<br>
+  - He will tell you what you need to do next in Mata Nui.<br>
+<br>
+
+
+<b>Kini-Nui</b><br>
+  Q. Where do I go? What do I do? Help!<br>
+  - Have you come across anyone on Mata Nui yet?<br>
+  - Look for Kapura outside of Ta-Koro.<br>
+  - He will explain things to you and go with you to Vakama.<br>
+  - Vakama will instruct you on how you must collect all the Tohunga from the villages.<br>
+<br>
+  Q. Now that I&#39;ve collected all my Tohunga, what do I do?<br>
+  - Have you tried talking to any of them?<br>
+  - Try looking right outside of Ga-koro.<br>
+  - Use Maku to sail into the waterfall.<br>
+<br>
+  Q. I&#39;ve come to a gorge. How do I get across?<br>
+  - Have you tried talking to your Tohunga?<br>
+  - Try using your Tohunga when you come to challenges.<br>
+  - Try using Tamaru to cross the gorge.<br>
+<br>
+  Q. I&#39;ve come to a rockslide. How do I pass?<br>
+  - Remember: Use your Tohunga when you come to challenges.<br>
+  - Try using Hafu and Taipu to clear the rock.<br>
+<br>
+  Q. I&#39;ve come to a locked gate. How can I get through?<br>
+  - Remember: Use your Tohunga when you come to challenges.<br>
+  - At the gate use Kopeke to carve a key of ice to pass.<br>
+<br>
+  Q. I&#39;m at Kini-Nui and the Rahi are attacking. What do I do?<br>
+  - Have you tried clicking on a Tohunga?<br>
+  - Click on a Tohunga to hurl a disk.<br>
+  - Click on a Rahi to choose a target.<br>
+  - Watch your health and the Rahi&#39;s health to see who will win.<br>
+  - In between battles, get sneak peeks at the Toa battling the Manas.<br>
+<br>
+  Q. When does the battle with the Rahi end?<br>
+  - You must keep fighting to protect the Toa.<br>
+  - After three victories, you will see the Rahi closing in.<br>
+  - Don&#39;t worry though, your fellow Tohunga from all of the villages will come to your aid!<br>
+<br>
+  Q. The Tohunga have helped me defeat the Rahi. What do I do now?<br>
+  - Remember Gali&#39;s message.<br>
+  - Have you talked to any of the Tohunga?<br>
+  - Try talking to some of the Onu-Koronan.<br>
+  - Ride the crab to Onu-Koro to investigate the strange goings on.<br>
+<br>
+  Q. I&#39;m in Onu-Koro and I don&#39;t know where to go.<br>
+  - Try talking to the Turaga of the village.<br>
+  - Go to Whenua&#39;s hut and talk to him.<br>
+  - Whenua will tell you to go to the Great Mine.<br>
+  - Take the elevator down and go to the Great Mine.<br>
+<br>
+  Q. What do I do once I&#39;m in the Great Mine?<br>
+  - Try looking around a bit.<br>
+  - Try the chamber where the Golden Kanohi was.<br>
+  - You will descend into Makuta&#39;s lair.<br>
+  - Walk towards the red portal.<br>
+  - You will get a secret view of the Toa&#39;s battle with Makuta!<br>
+<br>
+  Q. I&#39;m standing on the beach where the game started. What do I do now?<br>
+  - Do you see anyone nearby?<br>
+  - Try talking to Vakama.<br>
+  - Vakama will explain what has happened.<br>
+  - Congratulations! You&#39;ve saved the island and reached the end of the Mata Nui game. Thanks for playing!<br>
+<br>
+
+
+</td>
+	</tr>
+</table>
+</body>
+</html>

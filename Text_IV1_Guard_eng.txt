@@ -1,0 +1,1 @@
+NumStatements=3&Statement_1=You+may+pass.&Statement_2=Jala+says+we've+got+to+keep+a+sharp+lookout+for+Rahi.&Statement_3=If+the+bridge+is+down,+use+the+winch+room.
