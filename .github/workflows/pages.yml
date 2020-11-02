@@ -27,9 +27,8 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: artifacts
-        path: |
-          build/
+        name: pages-build
+        path: build/
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
