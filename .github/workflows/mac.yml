@@ -19,10 +19,8 @@ jobs:
         npm install
         npm run shockpkg update --summary
         npm run shockpkg install \
-          flash-player-32.0.0.445-mac-sa \
           flash-player-32.0.0.445-mac-sa-debug
         npm run build:mac
-        npm run build:mac-debug
         npm run dist:mac:tgz
         npm run dist:mac:dmg
       shell: bash

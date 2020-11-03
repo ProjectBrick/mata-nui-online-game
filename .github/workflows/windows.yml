@@ -19,10 +19,8 @@ jobs:
         npm install
         npm run shockpkg update --summary
         npm run shockpkg install \
-          flash-player-32.0.0.445-windows-sa \
           flash-player-32.0.0.445-windows-sa-debug
         npm run build:windows
-        npm run build:windows-debug
         npm run dist:windows:zip
         npm run dist:windows:exe
       shell: bash

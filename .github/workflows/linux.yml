@@ -19,14 +19,10 @@ jobs:
         npm install
         npm run shockpkg update --summary
         npm run shockpkg install \
-          flash-player-11.2.202.644-linux-i386-sa \
           flash-player-11.2.202.644-linux-i386-sa-debug \
-          flash-player-32.0.0.445-linux-x86_64-sa \
           flash-player-32.0.0.445-linux-x86_64-sa-debug
         npm run build:linux-i386
-        npm run build:linux-i386-debug
         npm run build:linux-x86_64
-        npm run build:linux-x86_64-debug
         npm run dist:linux-i386:tgz
         npm run dist:linux-x86_64:tgz
       shell: bash

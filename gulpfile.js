@@ -423,27 +423,15 @@ task('build:browser', async () => {
 task('build:windows', async () => {
 	await buildWindows(
 		'windows',
-		'flash-player-32.0.0.445-windows-sa'
-	);
-});
-
-task('build:windows-debug', async () => {
-	await buildWindows(
-		'windows-debug',
 		'flash-player-32.0.0.445-windows-sa-debug'
 	);
 });
 
 task('build:mac', async () => {
+	// Release versions on Mac have slow performance when resized larger.
+	// Debug versions do not have this performance issue.
 	await buildMac(
 		'mac',
-		'flash-player-32.0.0.445-mac-sa'
-	);
-});
-
-task('build:mac-debug', async () => {
-	await buildMac(
-		'mac-debug',
 		'flash-player-32.0.0.445-mac-sa-debug'
 	);
 });
@@ -451,13 +439,6 @@ task('build:mac-debug', async () => {
 task('build:linux-i386', async () => {
 	await buildLinux32(
 		'linux-i386',
-		'flash-player-11.2.202.644-linux-i386-sa'
-	);
-});
-
-task('build:linux-i386-debug', async () => {
-	await buildLinux32(
-		'linux-i386-debug',
 		'flash-player-11.2.202.644-linux-i386-sa-debug'
 	);
 });
@@ -465,13 +446,6 @@ task('build:linux-i386-debug', async () => {
 task('build:linux-x86_64', async () => {
 	await buildLinux64(
 		'linux-x86_64',
-		'flash-player-32.0.0.445-linux-x86_64-sa'
-	);
-});
-
-task('build:linux-x86_64-debug', async () => {
-	await buildLinux64(
-		'linux-x86_64-debug',
 		'flash-player-32.0.0.445-linux-x86_64-sa-debug'
 	);
 });
