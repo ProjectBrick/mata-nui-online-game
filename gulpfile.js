@@ -234,7 +234,7 @@ async function addDocs(dir) {
 				body.match(/<h\d[^>]*>([\s\S]*)?<\/h\d>/) || []
 			)[1] || '';
 			return fse.writeFile(
-				`${dir}/${f}`.replace(/\.md/i, '.html'),
+				`${dir}/${f}`.replace(/\.md$/i, '.html'),
 				templateStrings(template, {
 					title,
 					body
@@ -446,26 +446,16 @@ async function buildBrowser(dir, nested) {
 		'main.css'
 	].map(f => fse.copy(`src/browser/${f}`, `${destData}/${f}`)));
 	const defaultPrefix = 'matanuionlinegame.';
-	const vars = {
-		LS_PREFIX: process.env.MNOG_LS_PREFIX || defaultPrefix,
-		API_PREFIX: process.env.MNOG_API_PREFIX || defaultPrefix,
-		API_URL: process.env.MNOG_API_URL || '',
-		API_NAME: process.env.MNOG_API_NAME || '',
-		API_LINK: process.env.MNOG_API_LINK || ''
-	};
-	await fse.outputFile(
-		`${destData}/index.html`,
-		(await fse.readFile('src/browser/index.html', 'utf8')).replace(
-			/\$\{([^\}]*)\}/g,
-			(_all, p1) => {
-				const value = vars[p1];
-				if (typeof value !== 'string') {
-					throw new Error(`Undefined template variable: ${p1}`);
-				}
-				return vars[p1];
-			}
-		)
-	);
+	await fse.outputFile(`${destData}/index.html`, templateStrings(
+		await fse.readFile('src/browser/index.html', 'utf8'),
+		{
+			LS_PREFIX: process.env.MNOG_LS_PREFIX || defaultPrefix,
+			API_PREFIX: process.env.MNOG_API_PREFIX || defaultPrefix,
+			API_URL: process.env.MNOG_API_URL || '',
+			API_NAME: process.env.MNOG_API_NAME || '',
+			API_LINK: process.env.MNOG_API_LINK || ''
+		}
+	));
 	if (nested) {
 		await fse.outputFile(
 			`${dest}/${appName}.html`,
