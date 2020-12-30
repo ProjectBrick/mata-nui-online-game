@@ -40,6 +40,7 @@
 		"image-size": "^0.9.3",
 		"innosetup": "^6.0.5",
 		"jimp": "^0.16.1",
+		"marked": "^1.2.7",
 		"mime-types": "^2.1.27",
 		"slugify": "^1.4.6",
 		"tar": "^6.0.5",
