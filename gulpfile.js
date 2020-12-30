@@ -6,23 +6,29 @@ const stream = require('stream');
 
 const fse = require('fs-extra');
 const {task} = require('gulp');
+const slugify = require('slugify');
+const Jimp = require('jimp');
+const imageSize = require('image-size');
+const archiver = require('archiver');
+const tar = require('tar');
+const innosetup = require('innosetup');
+const {Manager} = require('@shockpkg/core');
 const {
 	Plist,
 	ValueDict,
 	ValueString,
 	ValueBoolean
 } = require('@shockpkg/plist-dom');
-const {Manager} = require('@shockpkg/core');
+const {
+	IconIco,
+	IconIcns
+} = require('@shockpkg/icon-encoder');
 const {
 	BundleWindows32,
 	BundleMacApp,
 	BundleLinux32,
 	BundleLinux64
 } = require('@shockpkg/swf-projector');
-const slugify = require('slugify');
-const archiver = require('archiver');
-const tar = require('tar');
-const innosetup = require('innosetup');
 
 const {Propercase} = require('./util/propercase');
 const {
@@ -39,6 +45,7 @@ const {
 } = require('./package.json');
 
 const pipelineP = util.promisify(stream.pipeline);
+const imageSizeP = util.promisify(imageSize);
 const innosetupP = util.promisify(innosetup);
 
 const appName = 'Mata Nui Online Game';
@@ -77,6 +84,57 @@ const sources = {
 async function shockpkgFile(pkg) {
 	return (new Manager()).with(
 		async manager => manager.packageInstallFile(pkg)
+	);
+}
+
+async function readIco(iconset) {
+	const ico = new IconIco();
+	for (const data of await Promise.all([
+		'256x256',
+		'128x128',
+		'64x64',
+		'48x48',
+		'32x32',
+		'24x24',
+		'16x16'
+	].map(f => fse.readFile(`${iconset}/${f}.png`)))) {
+		ico.addFromPng(data);
+	}
+	return ico.encode();
+}
+
+async function readIcns(iconset) {
+	const icns = new IconIcns();
+	icns.toc = true;
+	for (const [types, data] of await Promise.all([
+		[['ic12'], '32x32@2x'],
+		[['ic07'], '128x128'],
+		[['ic13'], '128x128@2x'],
+		[['ic08'], '256x256'],
+		[['ic04'], '16x16'],
+		[['ic14'], '256x256@2x'],
+		[['ic09'], '512x512'],
+		[['ic05'], '32x32'],
+		[['ic10'], '512x512@2x'],
+		[['ic11'], '16x16@2x']
+	].map(
+		([t, f]) => fse.readFile(`${iconset}/icon_${f}.png`).then(d => [t, d])
+	))) {
+		icns.addFromPng(data, types);
+	}
+	return icns.encode();
+}
+
+async function pngs2bmps(inDir, outDir) {
+	await Promise.all(
+		(await fse.readdir(inDir))
+			.filter(f => /^[^\.].*\.png$/i.test(f))
+			.map(f => Jimp
+				.read(`${inDir}/${f}`)
+				.then(i => i.write(
+					`${outDir}/${f}`.replace(/\.png$/i, '.bmp')
+				))
+			)
 	);
 }
 
@@ -187,6 +245,16 @@ async function makeTgz(target, source, name) {
 
 async function makeExe(target, source, id, name, file, exe) {
 	await fse.remove(target);
+	const res = `${target}.res`;
+	const resIcon = `${res}/icon.ico`;
+	const resHeaders = `${res}/headers`;
+	const resSidebars = `${res}/sidebars`;
+	await fse.remove(res);
+	await Promise.all([
+		readIco('res/inno-icon').then(d => fse.outputFile(resIcon, d)),
+		pngs2bmps('res/inno-header', resHeaders),
+		pngs2bmps('res/inno-sidebar', resSidebars),
+	]);
 	const vars = {
 		Id: id,
 		Name: name,
@@ -195,9 +263,9 @@ async function makeExe(target, source, id, name, file, exe) {
 		Publisher: author,
 		Copyright: copyright,
 		License: `${source}/LICENSE.txt`,
-		Icon: 'res/exe-icon.ico',
-		WizardImageHeader: 'res/exe-header-*.bmp',
-		WizardImageSidebar: 'res/exe-sidebar-*.bmp',
+		Icon: resIcon,
+		WizardImageHeader: `${resHeaders}/*.bmp`,
+		WizardImageSidebar: `${resSidebars}/*.bmp`,
 		WizardImageAlphaFormat: 'none',
 		ExeName: exe,
 		OutDir: path.dirname(target),
@@ -213,6 +281,7 @@ async function makeExe(target, source, id, name, file, exe) {
 			Object.entries(vars).map(([k, v]) => ([`DVar${k}`, v]))
 		)
 	});
+	await fse.remove(res);
 }
 
 async function makeDmg(target, specification) {
@@ -245,7 +314,7 @@ async function bundle(bundle, pkg) {
 	);
 }
 
-function createBundleMac(path) {
+async function createBundleMac(path) {
 	const pkgInfo = 'APPL????';
 	const infoPlist = new Plist(new ValueDict(new Map(Object.entries({
 		CFBundleInfoDictionaryVersion: new ValueString('6.0'),
@@ -278,14 +347,14 @@ function createBundleMac(path) {
 	projector.binaryName = appName;
 	projector.pkgInfoData = pkgInfo;
 	projector.infoPlistDocument = infoPlist;
-	projector.iconFile = 'res/icon.icns';
+	projector.iconData = await readIcns('res/app-icon-mac.iconset');
 	projector.patchWindowTitle = appName;
 	projector.removeInfoPlistStrings = true;
 	projector.removeCodeSignature = true;
 	return bundle;
 }
 
-function createBundleWindows(path) {
+async function createBundleWindows(path) {
 	const file = path.split(/[/\\]/).pop();
 	const fileName = file.replace(/\.exe$/i, '');
 	const versionStrings = {
@@ -304,13 +373,13 @@ function createBundleWindows(path) {
 	const bundle = new BundleWindows32(path);
 	const {projector} = bundle;
 	projector.versionStrings = versionStrings;
-	projector.iconFile = 'res/icon.ico';
+	projector.iconData = await readIco('res/app-icon-windows');
 	projector.patchWindowTitle = appName;
 	projector.removeCodeSignature = true;
 	return bundle;
 }
 
-function createBundleLinux32(path) {
+async function createBundleLinux32(path) {
 	const bundle = new BundleLinux32(path);
 	const {projector} = bundle;
 	projector.patchProjectorPath = true;
@@ -318,7 +387,7 @@ function createBundleLinux32(path) {
 	return bundle;
 }
 
-function createBundleLinux64(path) {
+async function createBundleLinux64(path) {
 	const bundle = new BundleLinux64(path);
 	const {projector} = bundle;
 	projector.patchProjectorPath = true;
@@ -374,28 +443,28 @@ async function buildBrowser(dir) {
 async function buildWindows(dir, pkg) {
 	const dest = `build/${dir}`;
 	await fse.remove(dest);
-	await bundle(createBundleWindows(`${dest}/${appName}.exe`), pkg);
+	await bundle(await createBundleWindows(`${dest}/${appName}.exe`), pkg);
 	await addLicense(dest);
 }
 
 async function buildMac(dir, pkg) {
 	const dest = `build/${dir}`;
 	await fse.remove(dest);
-	await bundle(createBundleMac(`${dest}/${appName}.app`), pkg);
+	await bundle(await createBundleMac(`${dest}/${appName}.app`), pkg);
 	await addLicense(dest);
 }
 
 async function buildLinux32(dir, pkg) {
 	const dest = `build/${dir}`;
 	await fse.remove(dest);
-	await bundle(createBundleLinux32(`${dest}/${appName}`), pkg);
+	await bundle(await createBundleLinux32(`${dest}/${appName}`), pkg);
 	await addLicense(dest);
 }
 
 async function buildLinux64(dir, pkg) {
 	const dest = `build/${dir}`;
 	await fse.remove(dest);
-	await bundle(createBundleLinux64(`${dest}/${appName}`), pkg);
+	await bundle(await createBundleLinux64(`${dest}/${appName}`), pkg);
 	await addLicense(dest);
 }
 
@@ -499,14 +568,17 @@ task('dist:mac:tgz', async () => {
 });
 
 task('dist:mac:dmg', async () => {
-	const width = 600;
-	const height = 500;
-	await makeDmg(`dist/${distName}-Mac.dmg`, {
+	const background = 'res/dmg-background/dmg-background.png';
+	const {width, height} = await imageSizeP(background);
+	const output = `dist/${distName}-Mac.dmg`;
+	const icon = `${output}.icns`;
+	await fse.outputFile(icon, await readIcns('res/dmg-icon.iconset'));
+	await makeDmg(output, {
 		format: 'UDBZ',
 		title: appName,
 		'icon-size': 128,
-		icon: 'res/dmg-icon.icns',
-		background: 'res/dmg-background.png',
+		icon,
+		background,
 		window: {
 			size: {
 				width,
@@ -515,25 +587,26 @@ task('dist:mac:dmg', async () => {
 		},
 		contents: [
 			{
-				x: (width / 2) + 150,
-				y: 100,
+				x: (width / 2) + 160,
+				y: 108,
 				type: 'link',
 				path: '/Applications'
 			},
 			{
-				x: (width / 2) - 150,
-				y: 100,
+				x: (width / 2) - 160,
+				y: 108,
 				type: 'file',
 				path: `build/mac/${appName}.app`
 			},
 			{
 				x: (width / 2),
-				y: 350,
+				y: 364,
 				type: 'file',
 				path: 'build/mac/LICENSE.txt'
 			}
 		]
 	});
+	await fse.remove(icon);
 });
 
 task('dist:linux-i386:tgz', async () => {
