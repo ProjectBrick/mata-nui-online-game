@@ -22,7 +22,7 @@ jobs:
 
     - run: |
         npm install
-        npm run build:browser
+        npm run build:pages
       shell: bash
 
     - uses: actions/upload-artifact@v2
@@ -34,4 +34,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: build/browser/data
+        publish_dir: build/pages
