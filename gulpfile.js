@@ -492,7 +492,7 @@ task('build:browser', async () => {
 task('build:windows', async () => {
 	await buildWindows(
 		'windows',
-		'flash-player-32.0.0.445-windows-sa-debug'
+		'flash-player-32.0.0.465-windows-sa-debug'
 	);
 });
 
@@ -501,7 +501,7 @@ task('build:mac', async () => {
 	// Debug versions do not have this performance issue.
 	await buildMac(
 		'mac',
-		'flash-player-32.0.0.445-mac-sa-debug'
+		'flash-player-32.0.0.465-mac-sa-debug-zip'
 	);
 });
 
@@ -515,7 +515,7 @@ task('build:linux-i386', async () => {
 task('build:linux-x86_64', async () => {
 	await buildLinux64(
 		'linux-x86_64',
-		'flash-player-32.0.0.445-linux-x86_64-sa-debug'
+		'flash-player-32.0.0.465-linux-x86_64-sa-debug'
 	);
 });
 
