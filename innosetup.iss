@@ -33,6 +33,7 @@ Source: "{#VarSource}"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs cr
 
 [Icons]
 Name: "{group}\{#VarNameFile}"; Filename: "{app}\{#VarExeName}"
+Name: "{group}\{#VarReadMeName}"; Filename: "{app}\{#VarReadMeFile}"
 Name: "{group}\{cm:UninstallProgram,{#VarNameFile}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#VarNameFile}"; Filename: "{app}\{#VarExeName}"; Tasks: desktopicon
 
