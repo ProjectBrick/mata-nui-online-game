@@ -1,5 +1,7 @@
 # Mata Nui Online Game -- README
 
+Once a paradise, Mata Nui has become a place of darkness and fear ruled by the deadly Makuta. Now six mighty heroes, the Toa, have come to gather Masks of Power and challenge Makuta. Explore the island...learn the legends...begin to solve the mystery of BIONICLE.
+
 
 ## Restored Content
 
