@@ -240,7 +240,7 @@ async function addDocs(dir) {
 	);
 }
 
-async function makeZip(target, source, name) {
+async function makeZip(target, source) {
 	await fse.remove(target);
 	await fse.ensureDir(path.dirname(target));
 	const archive = archiver('zip', {
@@ -252,12 +252,12 @@ async function makeZip(target, source, name) {
 		archive.emit('error', err);
 	});
 	const done = pipelineP(archive, fse.createWriteStream(target));
-	archive.directory(source, name);
+	archive.directory(source, false);
 	archive.finalize();
 	await done;
 }
 
-async function makeTgz(target, source, name) {
+async function makeTgz(target, source) {
 	await fse.remove(target);
 	await fse.ensureDir(path.dirname(target));
 	await tar.create(
@@ -265,10 +265,9 @@ async function makeTgz(target, source, name) {
 			gzip: true,
 			portable: true,
 			file: target,
-			cwd: source,
-			prefix: name
+			cwd: source
 		},
-		['.']
+		(await fse.readdir(source)).sort()
 	);
 }
 
@@ -547,30 +546,15 @@ task('build:linux-x86_64', async () => {
 });
 
 task('dist:browser:zip', async () => {
-	const name = `${distName}-Browser`;
-	await makeZip(
-		`dist/${name}.zip`,
-		'build/browser',
-		name
-	);
+	await makeZip(`dist/${distName}-Browser.zip`, 'build/browser');
 });
 
 task('dist:browser:tgz', async () => {
-	const name = `${distName}-Browser`;
-	await makeTgz(
-		`dist/${name}.tgz`,
-		'build/browser',
-		name
-	);
+	await makeTgz(`dist/${distName}-Browser.tgz`, 'build/browser');
 });
 
 task('dist:windows:zip', async () => {
-	const name = `${distName}-Windows`;
-	await makeZip(
-		`dist/${name}.zip`,
-		'build/windows',
-		name
-	);
+	await makeZip(`dist/${distName}-Windows.zip`, 'build/windows');
 });
 
 task('dist:windows:exe', async () => {
@@ -586,12 +570,7 @@ task('dist:windows:exe', async () => {
 });
 
 task('dist:mac:tgz', async () => {
-	const name = `${distName}-Mac`;
-	await makeTgz(
-		`dist/${name}.tgz`,
-		'build/mac',
-		name
-	);
+	await makeTgz(`dist/${distName}-Mac.tgz`, 'build/mac');
 });
 
 task('dist:mac:dmg', async () => {
@@ -637,21 +616,11 @@ task('dist:mac:dmg', async () => {
 });
 
 task('dist:linux-i386:tgz', async () => {
-	const name = `${distName}-Linux-i386`;
-	await makeTgz(
-		`dist/${name}.tgz`,
-		'build/linux-i386',
-		name
-	);
+	await makeTgz(`dist/${distName}-Linux-i386.tgz`, 'build/linux-i386');
 });
 
 task('dist:linux-x86_64:tgz', async () => {
-	const name = `${distName}-Linux-x86_64`;
-	await makeTgz(
-		`dist/${name}.tgz`,
-		'build/linux-x86_64',
-		name
-	);
+	await makeTgz(`dist/${distName}-Linux-x86_64.tgz`, 'build/linux-x86_64');
 });
 
 task('run:browser', async () => {
