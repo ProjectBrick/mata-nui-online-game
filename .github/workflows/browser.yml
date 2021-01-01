@@ -2,6 +2,8 @@ name: browser
 
 on:
   push:
+    tags:
+    - '**'
     branches-ignore:
     - pages
 

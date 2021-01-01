@@ -2,6 +2,8 @@ name: linux
 
 on:
   push:
+    tags:
+    - '**'
     branches-ignore:
     - pages
 
