@@ -4,8 +4,85 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<title>${title}</title>
+		<style>
+html {
+	line-height: 1.15;
+	-webkit-text-size-adjust: 100%;
+}
+body {
+	margin: 1em;
+	word-wrap: break-word;
+	font-family: sans-serif;
+	color: #222222;
+	background: #DDDDDD;
+}
+a {
+	background: transparent;
+	color: #0022FF;
+}
+img {
+	border-style: none;
+	max-width: 100%;
+	height: auto;
+}
+h1 {
+	text-align: center;
+}
+kbd,
+samp,
+code,
+pre {
+	font-family: monospace, monospace;
+	font-size: 1em;
+}
+kbd {
+	display: inline-block;
+	padding: 0.2em 0.5em;
+	border: 0.1em solid;
+	-webkit-border-radius: 0.2em;
+	-moz-border-radius: 0.2em;
+	border-radius: 0.2em;
+}
+pre {
+	padding: 1em;
+	background: #EEEEEE;
+}
+table {
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+th,
+td {
+	padding: 0.4em;
+	border: 0.1em solid;
+}
+hr {
+	box-sizing: content-box;
+	height: 0;
+	overflow: visible;
+	color: inherit;
+}
+.main {
+	max-width: 1024px;
+	margin: 0 auto;
+}
+@media (prefers-color-scheme: dark) {
+	body {
+		color: #DDDDDD;
+		background: #222222;
+	}
+	a {
+		color: #00DDFF;
+	}
+	pre {
+		background: #111111;
+	}
+}
+		</style>
 	</head>
 	<body>
+		<div class="main">
 ${body}
+		</div>
 	</body>
 </html>
