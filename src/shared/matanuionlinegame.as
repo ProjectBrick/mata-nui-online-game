@@ -15,6 +15,32 @@ var forEach = function(a, f) {
 		f(a[i], i);
 	}
 };
+var encodeQuery = function(str) {
+	var r = "";
+	for (var i = 0; i < str.length; i++) {
+		var c = str.charCodeAt(i);
+		if (
+			(97 <= c && c <= 122) ||
+			(65 <= c && c <= 90) ||
+			(48 <= c && c <= 57) ||
+			(c == 33) ||
+			(39 <= c && c <= 42) ||
+			(45 <= c && c <= 46) ||
+			(c == 95) ||
+			(c == 126)
+		) {
+			r += str.charAt(i);
+		}
+		else {
+			r += (
+				"%" +
+				(c <= 0xF ? "0" : "") +
+				(c.toString(16).toUpperCase())
+			);
+		}
+	}
+	return r;
+};
 var screenXY = function(mc, p) {
 	var r = 0;
 	for (var t = mc; t; t = t._parent) {
@@ -166,6 +192,7 @@ var overlay = self.createEmptyMovieClip("matanui_overlay", 0);
 var enterframe = multiEvents(overlay, "onEnterFrame");
 
 // Save API.
+var savePrefix = "matanui_";
 var save = Array(function() {
 	var setting = LSO ?
 		Array(function() {
@@ -195,7 +222,7 @@ var save = Array(function() {
 			};
 		})[0]() :
 		Array(function() {
-			var pre = "matanui_";
+			var pre = savePrefix;
 			var fsCmd = function(key, value) {
 				// A fscommand function call is compiled to getURL.
 				getURL("FSCommand:" + pre + key, value);
@@ -227,6 +254,7 @@ var save = Array(function() {
 		// Date from LEGO offline and Templar online releases.
 		date: setting("date", "1007406064"),
 		language: setting("language", "eng"),
+		fps: setting("fps", "18"),
 		state: setting("state", "&nostate=1&")
 	};
 })[0]();
@@ -458,6 +486,40 @@ var dialog = Array(function() {
 		}
 	};
 })[0]();
+
+// Function to maybe reload into a different FPS.
+var fpsMaybeReload = function() {
+	var switchTo = null;
+	var savedFps = save.fps.get();
+	if (savedFps === "30" && FPS !== 30) {
+		switchTo = "matanuionlinegame-30fps.swf";
+	}
+	else if (savedFps !== "30" && FPS === 30) {
+		switchTo = "matanuionlinegame.swf";
+	}
+	if (switchTo !== null) {
+		if (!LSO) {
+			var vars = [];
+			for (var p in save) {
+				if (save[p] && save[p].get) {
+					vars.push(
+						encodeQuery(savePrefix + p) +
+						"=" +
+						encodeQuery(save[p].get())
+					);
+				}
+			}
+			switchTo += "?" + vars.join("&");
+		}
+		if (self[overlayLayer]) {
+			// Swap back the ugly hack so replacing the root movie will work.
+			self.swapDepths(overlayLayer);
+		}
+		loadMovie(switchTo, "_level0");
+		return true;
+	}
+	return false;
+};
 
 // Function to reload player.
 var reload = function() {
@@ -739,6 +801,26 @@ var setupOverlay = function(cb) {
 				}
 			};
 		};
+		var button18FPS = function() {
+			return {
+				title: "18 FPS: Original",
+				action: function() {
+					dialog.close();
+					save.fps.set("18");
+					fpsMaybeReload();
+				}
+			};
+		};
+		var button30FPS = function() {
+			return {
+				title: "30 FPS: Faster",
+				action: function() {
+					dialog.close();
+					save.fps.set("30");
+					fpsMaybeReload();
+				}
+			};
+		};
 		var buttonClose = function() {
 			return {
 				title: "Close",
@@ -762,6 +844,8 @@ var setupOverlay = function(cb) {
 						buttonDeutsche(),
 						buttonTimestamp(),
 						buttonProgress(),
+						button18FPS(),
+						button30FPS(),
 						buttonClose()
 					],
 					null,
@@ -892,6 +976,10 @@ var mainNoOverlay = function() {
 	init(false);
 };
 var main = function() {
+	if (fpsMaybeReload()) {
+		return;
+	}
+
 	if (OVERLAY) {
 		mainOverlay();
 	}

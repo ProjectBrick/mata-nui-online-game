@@ -343,16 +343,20 @@ async function bundle(bundle, pkg, delay = false) {
 			delay ? 18 / 2 : 0
 		),
 		async b => {
-			await b.copyResourceFile(
-				'matanuionlinegame.swf',
-				'src/projector/matanuionlinegame.swf'
-			);
 			await readSourcesFiltered(async entry => {
 				await b.createResourceFile(entry.path, await entry.read());
 			});
 			await support.generate(async (path, data) => {
 				await b.createResourceFile(`support/${path}`, data);
 			});
+			await b.copyResourceFile(
+				'matanuionlinegame.swf',
+				'src/projector/matanuionlinegame.swf'
+			);
+			await b.copyResourceFile(
+				'matanuionlinegame-30fps.swf',
+				'src/projector/matanuionlinegame-30fps.swf'
+			);
 		}
 	);
 }
@@ -452,6 +456,7 @@ async function buildBrowser(dir, nested) {
 	});
 	await Promise.all([
 		'matanuionlinegame.swf',
+		'matanuionlinegame-30fps.swf',
 		'main.js',
 		'main.css'
 	].map(f => fse.copy(`src/browser/${f}`, `${destData}/${f}`)));
