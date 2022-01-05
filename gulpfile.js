@@ -357,6 +357,14 @@ async function bundle(bundle, pkg, delay = false) {
 				'matanuionlinegame-30fps.swf',
 				'src/projector/matanuionlinegame-30fps.swf'
 			);
+			await b.copyResourceFile(
+				'init.swf',
+				'src/shared/init.swf'
+			);
+			await b.copyResourceFile(
+				'overlay.swf',
+				'src/shared/overlay.swf'
+			);
 		}
 	);
 }
@@ -460,6 +468,10 @@ async function buildBrowser(dir, nested) {
 		'main.js',
 		'main.css'
 	].map(f => fse.copy(`src/browser/${f}`, `${destData}/${f}`)));
+	await Promise.all([
+		'init.swf',
+		'overlay.swf'
+	].map(f => fse.copy(`src/shared/${f}`, `${destData}/${f}`)));
 	const defaultPrefix = 'matanuionlinegame.';
 	await fse.outputFile(`${destData}/index.html`, templateStrings(
 		await fse.readFile('src/browser/index.html', 'utf8'),
