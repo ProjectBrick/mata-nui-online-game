@@ -1,0 +1,52 @@
+name: browser
+
+on:
+  push:
+    tags:
+      - '**'
+    branches-ignore:
+      - pages
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: NPM
+        run: npm ci
+
+      - name: Build
+        run: npm run build:browser
+
+      - name: Dist zip
+        run: npm run dist:browser:zip
+
+      - name: Dist tgz
+        run: npm run dist:browser:tgz
+
+      - name: Artifact build
+        uses: actions/upload-artifact@v3
+        with:
+          name: browser-build
+          path: build/
+
+      - name: Artifact dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: browser-dist
+          path: dist/
+
+      - name: Deploy
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/*

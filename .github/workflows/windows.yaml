@@ -1,0 +1,59 @@
+name: windows
+
+on:
+  push:
+    tags:
+      - '**'
+    branches-ignore:
+      - pages
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: NPM
+        run: npm ci
+
+      - name: shockpkg
+        run: |
+          npm run shockpkg -- update --summary
+          npm run shockpkg -- install \
+            flash-player-32.0.0.465-windows-sa-debug
+        shell: bash
+
+      - name: Build
+        run: npm run build:windows
+
+      - name: Dist zip
+        run: npm run dist:windows:zip
+
+      - name: Dist exe
+        run: npm run dist:windows:exe
+
+      - name: Artifact build
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: build/
+
+      - name: Artifact dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-dist
+          path: dist/
+
+      - name: Deploy
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/*
