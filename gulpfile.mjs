@@ -1,14 +1,6 @@
-import path from 'path';
-import util from 'util';
-import stream from 'stream';
-
 import fse from 'fs-extra';
 import gulp from 'gulp';
-import slugify from 'slugify';
 import {marked} from 'marked';
-import archiver from 'archiver';
-import tar from 'tar';
-import innosetup from 'innosetup';
 import {Manager} from '@shockpkg/core';
 import {
 	Plist,
@@ -25,11 +17,21 @@ import {
 } from '@shockpkg/swf-projector';
 
 import {
+	filename,
+	slugify
+} from './util/string.mjs';
+import {
 	imageSize,
 	pngs2bmps,
 	readIco,
 	readIcns
 } from './util/image.mjs';
+import {
+	makeZip,
+	makeTgz,
+	makeExe,
+	makeDmg
+} from './util/dist.mjs';
 import {Propercase} from './util/propercase.mjs';
 import {
 	SourceZip,
@@ -47,10 +49,7 @@ const {
 	copyright
 } = await fse.readJSON('./package.json');
 
-const pipelineP = util.promisify(stream.pipeline);
-const innosetupP = util.promisify(innosetup);
-
-const distName = slugify(`${appName} ${version}`);
+const distName = slugify(`${appName}-${version}`);
 const versionShort = version.split('.').slice(0, 2).join('.');
 const serverPort = +process.env.SERVER_PORT;
 
@@ -187,95 +186,6 @@ async function addDocs(dir) {
 			);
 		}))
 	);
-}
-
-async function makeZip(target, source) {
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
-	const archive = archiver('zip', {
-		zlib: {
-			level: 9
-		}
-	});
-	archive.on('warning', err => {
-		archive.emit('error', err);
-	});
-	const done = pipelineP(archive, fse.createWriteStream(target));
-	archive.directory(source, false);
-	archive.finalize();
-	await done;
-}
-
-async function makeTgz(target, source) {
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
-	await tar.create(
-		{
-			gzip: true,
-			portable: true,
-			file: target,
-			cwd: source
-		},
-		(await fse.readdir(source)).sort()
-	);
-}
-
-async function makeExe(target, source, id, name, file, exe) {
-	await fse.remove(target);
-	const res = `${target}.res`;
-	const resIcon = `${res}/icon.ico`;
-	const resHeaders = `${res}/headers`;
-	const resSidebars = `${res}/sidebars`;
-	await fse.remove(res);
-	await Promise.all([
-		readIco('res/inno-icon').then(d => fse.outputFile(resIcon, d)),
-		pngs2bmps('res/inno-header', resHeaders),
-		pngs2bmps('res/inno-sidebar', resSidebars),
-	]);
-	const vars = {
-		Id: id,
-		Name: name,
-		NameFile: file,
-		Version: version,
-		Publisher: author,
-		Copyright: copyright,
-		License: 'LICENSE.txt',
-		Icon: resIcon,
-		WizardImageHeader: `${resHeaders}/*.bmp`,
-		WizardImageSidebar: `${resSidebars}/*.bmp`,
-		WizardImageAlphaFormat: 'none',
-		ExeName: exe,
-		OutDir: path.dirname(target),
-		OutFile: path.basename(target).replace(/\.exe$/i, ''),
-		Source: `${source}/*`,
-		ArchitecturesInstallIn64BitMode: '',
-		ArchitecturesAllowed: '',
-		ReadMeName: `${name} - README`,
-		ReadMeFile: 'README.html'
-	};
-	await innosetupP('innosetup.iss', {
-		gui: false,
-		verbose: false,
-		...Object.fromEntries(
-			Object.entries(vars).map(([k, v]) => ([`DVar${k}`, v]))
-		)
-	});
-	await fse.remove(res);
-}
-
-async function makeDmg(target, specification) {
-	const {default: appdmg} = await import('appdmg');
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
-	await new Promise((resolve, reject) => {
-		const dmg = appdmg({
-			basepath: '.',
-			target,
-			specification
-		});
-		dmg.on('error', reject);
-		dmg.on('finish', resolve);
-	});
 }
 
 async function bundle(bundle, pkg, delay = false) {
@@ -536,15 +446,42 @@ gulp.task('dist:windows:zip', async () => {
 });
 
 gulp.task('dist:windows:exe', async () => {
-	const name = `${distName}-Windows`;
-	await makeExe(
-		`dist/${name}.exe`,
-		'build/windows',
-		appDomain,
-		appName,
-		appName,
-		`${appName}.exe`
-	);
+	const outDir = 'dist';
+	const outFile = `${distName}-Windows`;
+	const target = `${outDir}/${outFile}.exe`;
+	await fse.remove(target);
+	const res = `${target}.res`;
+	const resIcon = `${res}/icon.ico`;
+	const resHeaders = `${res}/headers`;
+	const resSidebars = `${res}/sidebars`;
+	await fse.remove(res);
+	await Promise.all([
+		readIco('res/inno-icon').then(d => fse.outputFile(resIcon, d)),
+		pngs2bmps('res/inno-header', resHeaders),
+		pngs2bmps('res/inno-sidebar', resSidebars),
+	]);
+	await makeExe('innosetup.iss', {
+		VarId: appDomain,
+		VarName: appName,
+		VarNameFile: filename(appName),
+		VarVersion: version,
+		VarPublisher: author,
+		VarCopyright: copyright,
+		VarLicense: 'LICENSE.txt',
+		VarIcon: resIcon,
+		VarWizardImageHeader: `${resHeaders}/*.bmp`,
+		VarWizardImageSidebar: `${resSidebars}/*.bmp`,
+		VarWizardImageAlphaFormat: 'none',
+		VarExeName: `${filename(appName)}.exe`,
+		VarOutDir: outDir,
+		VarOutFile: outFile,
+		VarSource: `build/windows/*`,
+		VarArchitecturesInstallIn64BitMode: '',
+		VarArchitecturesAllowed: '',
+		VarReadMeName: `${filename(appName)} - README`,
+		VarReadMeFile: 'README.html'
+	});
+	await fse.remove(res);
 });
 
 gulp.task('dist:mac:tgz', async () => {
