@@ -6,7 +6,6 @@ import fse from 'fs-extra';
 import gulp from 'gulp';
 import slugify from 'slugify';
 import Jimp from 'jimp';
-import imageSize from 'image-size';
 import {marked} from 'marked';
 import archiver from 'archiver';
 import tar from 'tar';
@@ -30,6 +29,12 @@ import {
 	loader
 } from '@shockpkg/swf-projector';
 
+import {
+	imageSize,
+	pngs2bmps,
+	readIco,
+	readIcns
+} from './util/image.mjs';
 import {Propercase} from './util/propercase.mjs';
 import {
 	SourceZip,
@@ -48,7 +53,6 @@ const {
 } = await fse.readJSON('./package.json');
 
 const pipelineP = util.promisify(stream.pipeline);
-const imageSizeP = util.promisify(imageSize);
 const innosetupP = util.promisify(innosetup);
 
 const distName = slugify(`${appName} ${version}`);
@@ -95,56 +99,6 @@ function templateStrings(str, vars) {
 		}
 		return vars[p1];
 	});
-}
-
-async function readIco(iconset) {
-	const ico = new IconIco();
-	for (const data of await Promise.all([
-		'256x256',
-		'128x128',
-		'64x64',
-		'48x48',
-		'32x32',
-		'24x24',
-		'16x16'
-	].map(f => fse.readFile(`${iconset}/${f}.png`)))) {
-		ico.addFromPng(data);
-	}
-	return ico.encode();
-}
-
-async function readIcns(iconset) {
-	const icns = new IconIcns();
-	icns.toc = true;
-	for (const [types, data] of await Promise.all([
-		[['ic12'], '32x32@2x'],
-		[['ic07'], '128x128'],
-		[['ic13'], '128x128@2x'],
-		[['ic08'], '256x256'],
-		[['ic04'], '16x16'],
-		[['ic14'], '256x256@2x'],
-		[['ic09'], '512x512'],
-		[['ic05'], '32x32'],
-		[['ic10'], '512x512@2x'],
-		[['ic11'], '16x16@2x']
-	].map(
-		([t, f]) => fse.readFile(`${iconset}/icon_${f}.png`).then(d => [t, d])
-	))) {
-		icns.addFromPng(data, types);
-	}
-	return icns.encode();
-}
-
-async function pngs2bmps(inDir, outDir) {
-	await Promise.all((await fse.readdir(inDir))
-		.filter(f => /^[^\.].*\.png$/i.test(f))
-		.map(f => Jimp
-			.read(`${inDir}/${f}`)
-			.then(i => i.write(
-				`${outDir}/${f}`.replace(/\.png$/i, '.bmp')
-			))
-		)
-	);
 }
 
 async function readSources(order, each) {
@@ -604,7 +558,7 @@ gulp.task('dist:mac:tgz', async () => {
 
 gulp.task('dist:mac:dmg', async () => {
 	const background = 'res/dmg-background/dmg-background.png';
-	const {width, height} = await imageSizeP(background);
+	const {width, height} = await imageSize(background);
 	const output = `dist/${distName}-Mac.dmg`;
 	const icon = `${output}.icns`;
 	await fse.outputFile(icon, await readIcns('res/dmg-icon.iconset'));
