@@ -5,7 +5,6 @@ import stream from 'stream';
 import fse from 'fs-extra';
 import gulp from 'gulp';
 import slugify from 'slugify';
-import Jimp from 'jimp';
 import {marked} from 'marked';
 import archiver from 'archiver';
 import tar from 'tar';
@@ -17,10 +16,6 @@ import {
 	ValueString,
 	ValueBoolean
 } from '@shockpkg/plist-dom';
-import {
-	IconIco,
-	IconIcns
-} from '@shockpkg/icon-encoder';
 import {
 	BundleWindows32,
 	BundleMacApp,
