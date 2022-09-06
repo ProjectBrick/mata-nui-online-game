@@ -1,12 +1,10 @@
-'use strict';
+import path from 'path';
+import {promisify} from 'util';
 
-const path = require('path');
-const {promisify} = require('util');
+import fse from 'fs-extra';
+import yauzl from 'yauzl';
 
-const fse = require('fs-extra');
-const yauzl = require('yauzl');
-
-class Source extends Object {
+export class Source extends Object {
 	constructor(path) {
 		super();
 		this.path = path;
@@ -21,9 +19,8 @@ class Source extends Object {
 		throw new Error('Must subclass');
 	}
 }
-exports.Source = Source;
 
-class SourceZip extends Source {
+export class SourceZip extends Source {
 	constructor(path, base) {
 		super(path);
 		this.base = base;
@@ -80,9 +77,8 @@ class SourceZip extends Source {
 		}
 	}
 }
-exports.SourceZip = SourceZip;
 
-class SourceDir extends Source {
+export class SourceDir extends Source {
 	constructor(path) {
 		super(path);
 		this._entries = null;
@@ -140,4 +136,3 @@ class SourceDir extends Source {
 		}
 	}
 }
-exports.SourceDir = SourceDir;

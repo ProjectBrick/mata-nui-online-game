@@ -1,50 +1,48 @@
-'use strict';
+import path from 'path';
+import util from 'util';
+import stream from 'stream';
 
-const path = require('path');
-const util = require('util');
-const stream = require('stream');
-
-const fse = require('fs-extra');
-const {task} = require('gulp');
-const slugify = require('slugify');
-const Jimp = require('jimp');
-const imageSize = require('image-size');
-const {marked} = require('marked');
-const archiver = require('archiver');
-const tar = require('tar');
-const innosetup = require('innosetup');
-const {Manager} = require('@shockpkg/core');
-const {
+import fse from 'fs-extra';
+import gulp from 'gulp';
+import slugify from 'slugify';
+import Jimp from 'jimp';
+import imageSize from 'image-size';
+import {marked} from 'marked';
+import archiver from 'archiver';
+import tar from 'tar';
+import innosetup from 'innosetup';
+import {Manager} from '@shockpkg/core';
+import {
 	Plist,
 	ValueDict,
 	ValueString,
 	ValueBoolean
-} = require('@shockpkg/plist-dom');
-const {
+} from '@shockpkg/plist-dom';
+import {
 	IconIco,
 	IconIcns
-} = require('@shockpkg/icon-encoder');
-const {
+} from '@shockpkg/icon-encoder';
+import {
 	BundleWindows32,
 	BundleMacApp,
 	BundleLinux32,
 	BundleLinux64,
 	loader
-} = require('@shockpkg/swf-projector');
+} from '@shockpkg/swf-projector';
 
-const {Propercase} = require('./util/propercase');
-const {
+import {Propercase} from './util/propercase.mjs';
+import {
 	SourceZip,
 	SourceDir
-} = require('./util/sources');
-const {Server} = require('./util/server');
-const swf = require('./util/swf');
-const support = require('./support/generator');
+} from './util/sources.mjs';
+import {Server} from './util/server.mjs';
+import {setFps} from './util/swf.mjs';
+import {generate} from './support/generator.mjs';
 const {
 	version,
 	author,
 	copyright
-} = require('./package.json');
+} = await fse.readJSON('./package.json');
 
 const pipelineP = util.promisify(stream.pipeline);
 const imageSizeP = util.promisify(imageSize);
@@ -58,7 +56,7 @@ const serverPort = +process.env.SERVER_PORT;
 
 // This was a Flash 4 game, and the maximum FPS in Flash Player 4 was 18.
 // The FPS set in the SWF files is greater, leading to faster playback.
-// http://www.macromedia.com/support/flash/releasenotes/player/releasenotes_player_5.htm
+// http://www.macromedia.com/generate/flash/releasenotes/player/releasenotes_player_5.htm
 const correctFps = 18;
 
 const sources = {
@@ -177,7 +175,7 @@ async function readSources(order, each) {
 						data = await propercase.dataCached(data);
 					}
 					if (/\.swf$/i.test(p)) {
-						swf.setFps(data, correctFps);
+						setFps(data, correctFps);
 					}
 					return data;
 				}
@@ -346,7 +344,7 @@ async function bundle(bundle, pkg, delay = false) {
 			await readSourcesFiltered(async entry => {
 				await b.createResourceFile(entry.path, await entry.read());
 			});
-			await support.generate(async (path, data) => {
+			await generate(async (path, data) => {
 				await b.createResourceFile(`support/${path}`, data);
 			});
 			await b.copyResourceFile(
@@ -459,7 +457,7 @@ async function buildBrowser(dir, nested) {
 		const data = await entry.read();
 		await fse.outputFile(`${destData}/${entry.path}`, data);
 	});
-	await support.generate(async (path, data) => {
+	await generate(async (path, data) => {
 		await fse.outputFile(`${destData}/support/${path}`, data);
 	});
 	await Promise.all([
@@ -531,28 +529,28 @@ async function server(dir) {
 	});
 }
 
-task('clean', async () => {
+gulp.task('clean', async () => {
 	await fse.remove('.cache');
 	await fse.remove('build');
 	await fse.remove('dist');
 });
 
-task('build:pages', async () => {
+gulp.task('build:pages', async () => {
 	await buildBrowser('pages', false);
 });
 
-task('build:browser', async () => {
+gulp.task('build:browser', async () => {
 	await buildBrowser('browser', true);
 });
 
-task('build:windows', async () => {
+gulp.task('build:windows', async () => {
 	await buildWindows(
 		'windows',
 		'flash-player-32.0.0.465-windows-sa-debug'
 	);
 });
 
-task('build:mac', async () => {
+gulp.task('build:mac', async () => {
 	// Release versions on Mac have slow performance when resized larger.
 	// Debug versions do not have this performance issue.
 	await buildMac(
@@ -561,33 +559,33 @@ task('build:mac', async () => {
 	);
 });
 
-task('build:linux-i386', async () => {
+gulp.task('build:linux-i386', async () => {
 	await buildLinux32(
 		'linux-i386',
 		'flash-player-11.2.202.644-linux-i386-sa-debug'
 	);
 });
 
-task('build:linux-x86_64', async () => {
+gulp.task('build:linux-x86_64', async () => {
 	await buildLinux64(
 		'linux-x86_64',
 		'flash-player-32.0.0.465-linux-x86_64-sa-debug'
 	);
 });
 
-task('dist:browser:zip', async () => {
+gulp.task('dist:browser:zip', async () => {
 	await makeZip(`dist/${distName}-Browser.zip`, 'build/browser');
 });
 
-task('dist:browser:tgz', async () => {
+gulp.task('dist:browser:tgz', async () => {
 	await makeTgz(`dist/${distName}-Browser.tgz`, 'build/browser');
 });
 
-task('dist:windows:zip', async () => {
+gulp.task('dist:windows:zip', async () => {
 	await makeZip(`dist/${distName}-Windows.zip`, 'build/windows');
 });
 
-task('dist:windows:exe', async () => {
+gulp.task('dist:windows:exe', async () => {
 	const name = `${distName}-Windows`;
 	await makeExe(
 		`dist/${name}.exe`,
@@ -599,11 +597,11 @@ task('dist:windows:exe', async () => {
 	);
 });
 
-task('dist:mac:tgz', async () => {
+gulp.task('dist:mac:tgz', async () => {
 	await makeTgz(`dist/${distName}-Mac.tgz`, 'build/mac');
 });
 
-task('dist:mac:dmg', async () => {
+gulp.task('dist:mac:dmg', async () => {
 	const background = 'res/dmg-background/dmg-background.png';
 	const {width, height} = await imageSizeP(background);
 	const output = `dist/${distName}-Mac.dmg`;
@@ -645,14 +643,14 @@ task('dist:mac:dmg', async () => {
 	await fse.remove(icon);
 });
 
-task('dist:linux-i386:tgz', async () => {
+gulp.task('dist:linux-i386:tgz', async () => {
 	await makeTgz(`dist/${distName}-Linux-i386.tgz`, 'build/linux-i386');
 });
 
-task('dist:linux-x86_64:tgz', async () => {
+gulp.task('dist:linux-x86_64:tgz', async () => {
 	await makeTgz(`dist/${distName}-Linux-x86_64.tgz`, 'build/linux-x86_64');
 });
 
-task('run:browser', async () => {
+gulp.task('run:browser', async () => {
 	await server('build/browser/data');
 });

@@ -1,12 +1,13 @@
-'use strict';
+import {fileURLToPath} from 'url';
+import path from 'path';
 
-const path = require('path');
+import fse from 'fs-extra';
+import fg from 'fast-glob';
+import ejs from 'ejs';
 
-const fse = require('fs-extra');
-const fg = require('fast-glob');
-const ejs = require('ejs');
+import qa from './lib/qa.mjs';
 
-const qa = require('./lib/qa');
+const basedir = path.dirname(fileURLToPath(import.meta.url));
 
 const html = '.html';
 
@@ -40,7 +41,7 @@ const route = {
 };
 
 async function render(template, data = {}) {
-	const tpl = path.join(__dirname, 'tpl', `${template}.ejs`);
+	const tpl = path.join(basedir, 'tpl', `${template}.ejs`);
 	const d = {route, qa, ...data};
 	const out = await ejs.renderFile(tpl, d, {async: true});
 	return Buffer.from(out, 'utf8');
@@ -126,32 +127,14 @@ async function generateTpl(each) {
 }
 
 async function generateStatic(each) {
-	const staticDir = path.join(__dirname, 'static');
+	const staticDir = path.join(basedir, 'static');
 	const files = await fg(['**/*'], {cwd: staticDir});
 	for (const file of files) {
 		await each(file, await fse.readFile(path.join(staticDir, file)));
 	}
 }
 
-async function generate(each) {
+export async function generate(each) {
 	await generateTpl(each);
 	await generateStatic(each);
-}
-exports.generate = generate;
-
-async function main() {
-	const args = process.argv.slice(2);
-	if (!args.length) {
-		throw new Error('Arguments: outdir');
-	}
-	const [outdir] = args;
-	await generate(async (p, d) => {
-		await fse.outputFile(path.join(outdir, p), d);
-	});
-}
-if (!module.parent) {
-	main().catch(err => {
-		process.exitCode = 1;
-		console.error(err);
-	});
 }

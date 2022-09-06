@@ -11,12 +11,10 @@ function findFps(data) {
 	return rectOff + rectBytes
 }
 
-function getFps(data, fps) {
+export function getFps(data, fps) {
 	return data.readUInt16BE(findFps(data));
 }
-exports.getFps = getFps;
 
-function setFps(data, fps) {
+export function setFps(data, fps) {
 	data.writeUInt16BE(fps, findFps(data));
 }
-exports.setFps = setFps;

@@ -1,9 +1,7 @@
-'use strict';
+import path from 'path';
+import crypto from 'crypto';
 
-const path = require('path');
-const crypto = require('crypto');
-
-const fse = require('fs-extra');
+import fse from 'fs-extra';
 
 function hash(data) {
 	return crypto
@@ -13,7 +11,7 @@ function hash(data) {
 		.toLowerCase();
 }
 
-class Propercase extends Object {
+export class Propercase extends Object {
 	constructor(path, encoding = 'utf8') {
 		super();
 		this.path = path;
@@ -82,4 +80,3 @@ class Propercase extends Object {
 		return d;
 	}
 }
-exports.Propercase = Propercase;

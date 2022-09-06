@@ -1,6 +1,4 @@
-'use strict';
-
-// CommonJS module made from code here:
+// ES module made from code here:
 // https://web.archive.org/web/20030211195851id_/http://www.lego.com:80/eng/bionicle/assembler.asp?pageid=support&contid=matanuitips
 
 var Sections = new Array()
@@ -572,4 +570,4 @@ for (const section of Sections) {
 		question.answers = question.answers.map(matoranToTohunga);
 	}
 }
-exports.sections = Sections;
+export default {sections: Sections};

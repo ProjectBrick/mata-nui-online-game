@@ -1,17 +1,14 @@
-'use strict';
+import http from 'http';
+import path from 'path';
+import {promisify} from 'util';
+import {pipeline} from 'stream';
 
-const {URL} = require('url');
-const http = require('http');
-const path = require('path');
-const {promisify} = require('util');
-const {pipeline} = require('stream');
-
-const fse = require('fs-extra');
-const mime = require('mime-types');
+import fse from 'fs-extra';
+import mime from 'mime-types';
 
 const pipelineP = promisify(pipeline);
 
-class Server extends Object {
+export class Server extends Object {
 	constructor() {
 		super();
 		this.dir = '.';
@@ -106,4 +103,3 @@ class Server extends Object {
 		});
 	}
 }
-exports.Server = Server;
