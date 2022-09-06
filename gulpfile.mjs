@@ -314,7 +314,7 @@ async function makeExe(target, source, id, name, file, exe) {
 }
 
 async function makeDmg(target, specification) {
-	const appdmg = require('appdmg');
+	const {default: appdmg} = await import('appdmg');
 	await fse.remove(target);
 	await fse.ensureDir(path.dirname(target));
 	await new Promise((resolve, reject) => {
