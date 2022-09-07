@@ -45,10 +45,10 @@ async function * readSources(sources) {
 		for (const [path, read] of source.itter()) {
 			m.set(path.toLowerCase(), [propercase.name(path), async () => {
 				let data = await read();
-				if (/\.(swf|txt)$/i.test(p)) {
+				if (/\.(swf|txt)$/i.test(path)) {
 					data = await propercase.dataCached(data);
 				}
-				if (/\.swf$/i.test(p)) {
+				if (/\.swf$/i.test(path)) {
 					setFps(data, flash4FpsCap);
 				}
 				return data;
