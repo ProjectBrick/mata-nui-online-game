@@ -1,18 +1,18 @@
-import path from 'path';
-import util from 'util';
-import stream from 'stream';
+import {createWriteStream} from 'fs';
+import {readdir, mkdir, rm} from 'fs/promises';
+import {dirname} from 'path';
+import {promisify} from 'util';
+import {pipeline} from 'stream';
 
-import fse from 'fs-extra';
 import archiver from 'archiver';
 import tar from 'tar';
-import _innosetup from 'innosetup';
+import innosetup from 'innosetup';
 
-const pipeline = util.promisify(stream.pipeline);
-const innosetup = util.promisify(_innosetup);
+const pipe = promisify(pipeline);
 
 export async function makeZip(target, source) {
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
+	await rm(target, {force: true});
+	await mkdir(dirname(target), {recursive: true});
 	const archive = archiver('zip', {
 		zlib: {
 			level: 9
@@ -21,15 +21,15 @@ export async function makeZip(target, source) {
 	archive.on('warning', err => {
 		archive.emit('error', err);
 	});
-	const done = pipeline(archive, fse.createWriteStream(target));
+	const done = pipe(archive, createWriteStream(target));
 	archive.directory(source, false);
 	archive.finalize();
 	await done;
 }
 
 export async function makeTgz(target, source) {
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
+	await rm(target, {force: true});
+	await mkdir(dirname(target), {recursive: true});
 	await tar.create(
 		{
 			gzip: true,
@@ -37,14 +37,14 @@ export async function makeTgz(target, source) {
 			file: target,
 			cwd: source
 		},
-		(await fse.readdir(source)).sort()
+		(await readdir(source)).sort()
 	);
 }
 
 export async function makeDmg(target, specification) {
 	const {default: appdmg} = await import('appdmg');
-	await fse.remove(target);
-	await fse.ensureDir(path.dirname(target));
+	await rm(target, {force: true});
+	await mkdir(dirname(target), {recursive: true});
 	await new Promise((resolve, reject) => {
 		const dmg = appdmg({
 			basepath: '.',
@@ -57,11 +57,19 @@ export async function makeDmg(target, specification) {
 }
 
 export async function makeExe(iss, vars) {
-	await innosetup(iss, {
-		gui: false,
-		verbose: false,
-		...Object.fromEntries(
-			Object.entries(vars).map(([k, v]) => ([`D${k}`, v]))
-		)
-	});
+	await new Promise((resolve, reject) => {
+		innosetup(iss, {
+			gui: false,
+			verbose: false,
+			...Object.fromEntries(
+				Object.entries(vars).map(([k, v]) => ([`D${k}`, v]))
+			)
+		}, err => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve();
+		});
+	})
 }

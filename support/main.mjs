@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-import path from 'path';
+import {mkdir, writeFile} from 'fs/promises';
+import {dirname} from 'path';
 
-import fse from 'fs-extra';
-
-import {generate} from './generator.mjs';
+import {support} from './support.mjs';
 
 async function main() {
 	const args = process.argv.slice(2);
@@ -12,11 +11,13 @@ async function main() {
 		throw new Error('Arguments: outdir');
 	}
 	const [outdir] = args;
-	await generate(async (p, d) => {
-		await fse.outputFile(path.join(outdir, p), d);
-	});
+	for await (const [f, d] of support()) {
+		const o = `${outdir}/${f}`;
+		await mkdir(dirname(o), {recursive: true});
+		await writeFile(o, d);
+	}
 }
 main().catch(err => {
-	process.exitCode = 1;
 	console.error(err);
+	process.exitCode = 1;
 });

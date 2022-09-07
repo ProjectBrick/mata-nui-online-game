@@ -1,14 +1,15 @@
-import fse from 'fs-extra';
+import {readdir, readFile, writeFile} from 'fs/promises';
+
 import {marked} from 'marked';
 
 import {templateStrings} from './string.mjs';
 
 export async function docs(src, dst, replace = []) {
-	const template = await fse.readFile(`${src}/template.html`, 'utf8');
+	const template = await readFile(`${src}/template.html`, 'utf8');
 	await Promise.all(
-		(await fse.readdir(src))
+		(await readdir(src))
 			.filter(f => /^[^\.].*\.md$/i.test(f))
-			.map(f => fse.readFile(`${src}/${f}`, 'utf8').then(md => {
+			.map(f => readFile(`${src}/${f}`, 'utf8').then(md => {
 				const body = marked(md, {
 					gfm: true,
 					breaks: true,
@@ -24,7 +25,7 @@ export async function docs(src, dst, replace = []) {
 				for (const [f, r] of replace) {
 					html = html.replace(f, r);
 				}
-				return fse.writeFile(
+				return writeFile(
 					`${dst}/${f}`.replace(/\.md$/i, '.html'),
 					html
 				);

@@ -1,5 +1,3 @@
-'use strict';
-
 function findFps(data) {
 	const sig = data.toString('ascii', 0, 3);
 	if (sig !== 'FWS') {

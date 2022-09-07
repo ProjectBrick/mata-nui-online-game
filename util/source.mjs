@@ -1,7 +1,5 @@
-import path from 'path';
-import {promisify} from 'util';
+import {readFile, readdir} from 'fs/promises';
 
-import fse from 'fs-extra';
 import yauzl from 'yauzl';
 
 export class Source extends Object {
@@ -28,8 +26,14 @@ export class SourceZip extends Source {
 		this._entries = null;
 	}
 	async open() {
-		const zipfile = await promisify(yauzl.open)(this.path, {
-			autoClose: false
+		const zipfile = await new Promise((resolve, reject) => {
+			yauzl.open(this.path, {autoClose: false}, (err, zipfile) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+				resolve(zipfile);
+			});
 		});
 		const entries = [];
 		await new Promise((resolve, reject) => {
@@ -59,9 +63,15 @@ export class SourceZip extends Source {
 				await each({
 					path: fileName.substr(base.length),
 					read: async () => {
-						const stream = await promisify(
-							zipfile.openReadStream.bind(zipfile)
-						)(entry);
+						const stream = await new Promise((resolve, reject) => {
+							zipfile.openReadStream(entry, (err, stream) => {
+								if (err) {
+									reject(err);
+									return;
+								}
+								resolve(stream);
+							})
+						});
 						const datas = [];
 						await new Promise((resolve, reject) => {
 							stream.on('error', reject);
@@ -88,7 +98,7 @@ export class SourceDir extends Source {
 		const dirs = [''];
 		while (dirs.length) {
 			const dir = dirs.shift();
-			const list = (await fse.readdir(`${this.path}/${dir}`, {
+			const list = (await readdir(`${this.path}/${dir}`, {
 				withFileTypes: true
 			})).sort((a, b) => {
 				a = a.name;
@@ -122,9 +132,7 @@ export class SourceDir extends Source {
 			if (entry.dirent.isFile()) {
 				await each({
 					path: entry.path,
-					read: async () => fse.readFile(
-						path.join(this.path, entry.path)
-					)
+					read: async () => readFile(`${this.path}/${entry.path}`)
 				});
 			}
 			else if (entry.dirent.isDirectory()) {

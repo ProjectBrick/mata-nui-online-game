@@ -1,17 +1,10 @@
-import util from 'util';
+import {readdir, readFile} from 'fs/promises';
 
-import fse from 'fs-extra';
-import {imageSize as _imageSize} from 'image-size';
 import Jimp from 'jimp';
-import {
-	IconIco,
-	IconIcns
-} from '@shockpkg/icon-encoder';
-
-export const imageSize = util.promisify(_imageSize);
+import {IconIco, IconIcns} from '@shockpkg/icon-encoder';
 
 export async function pngs2bmps(inDir, outDir) {
-	await Promise.all((await fse.readdir(inDir))
+	await Promise.all((await readdir(inDir))
 		.filter(f => /^[^\.].*\.png$/i.test(f))
 		.map(f => Jimp
 			.read(`${inDir}/${f}`)
@@ -32,7 +25,7 @@ export async function readIco(iconset) {
 		'32x32',
 		'24x24',
 		'16x16'
-	].map(f => fse.readFile(`${iconset}/${f}.png`)))) {
+	].map(f => readFile(`${iconset}/${f}.png`)))) {
 		ico.addFromPng(data);
 	}
 	return ico.encode();
@@ -53,7 +46,7 @@ export async function readIcns(iconset) {
 		[['ic10'], '512x512@2x'],
 		[['ic11'], '16x16@2x']
 	].map(
-		([t, f]) => fse.readFile(`${iconset}/icon_${f}.png`).then(d => [t, d])
+		([t, f]) => readFile(`${iconset}/icon_${f}.png`).then(d => [t, d])
 	))) {
 		icns.addFromPng(data, types);
 	}

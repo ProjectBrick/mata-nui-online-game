@@ -1,14 +1,8 @@
-import path from 'path';
-import crypto from 'crypto';
-
-import fse from 'fs-extra';
+import {mkdir, readFile, rename, stat, writeFile} from 'fs/promises';
+import {createHash} from 'crypto';
 
 function hash(data) {
-	return crypto
-		.createHash('sha256')
-		.update(data)
-		.digest('hex')
-		.toLowerCase();
+	return createHash('sha256').update(data).digest('hex');
 }
 
 export class Propercase extends Object {
@@ -24,7 +18,7 @@ export class Propercase extends Object {
 		// Sorted shortest first, so shorter replaces are replaced by longer.
 		// Skip lines that start with slash, a comment.
 		this._map = new Map(
-			(await fse.readFile(this.path, this.encoding))
+			(await readFile(this.path, this.encoding))
 				.split(/[\r\n]+/)
 				.filter(s => s && !s.startsWith('/'))
 				.sort((a, b) => a.length - b.length)
@@ -67,16 +61,17 @@ export class Propercase extends Object {
 			throw new Error('Cache directory not set');
 		}
 
-		const file = path.join(cacheDir, hash(data));
-		if (await fse.pathExists(file)) {
-			return fse.readFile(file);
+		const file = `${cacheDir}/${hash(data)}`;
+		if (await stat(file).catch(() => null)) {
+			return readFile(file);
 		}
 
+		await mkdir(cacheDir, {recursive: true});
 		const d = Buffer.concat([data]);
 		this.data(d);
 		const tmp = `${file}.tmp`;
-		await fse.outputFile(tmp, d);
-		await fse.move(tmp, file);
+		await writeFile(tmp, d);
+		await rename(tmp, file);
 		return d;
 	}
 }

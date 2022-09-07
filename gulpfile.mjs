@@ -27,7 +27,6 @@ import {
 	distName
 } from './util/meta.mjs';
 import {
-	imageSize,
 	pngs2bmps,
 	readIco,
 	readIcns
@@ -46,7 +45,7 @@ import {
 	SourceDir
 } from './util/source.mjs';
 import {setFps} from './util/fps.mjs';
-import {generate} from './support/generator.mjs';
+import {support} from './support/support.mjs';
 
 // This was a Flash 4 game, and the maximum FPS in Flash Player 4 was 18.
 // The FPS set in the SWF files is greater, leading to faster playback.
@@ -157,9 +156,9 @@ async function bundle(bundle, pkg, delay = false) {
 			await readSourcesFiltered(async entry => {
 				await b.createResourceFile(entry.path, await entry.read());
 			});
-			await generate(async (path, data) => {
-				await b.createResourceFile(`support/${path}`, data);
-			});
+			for await (const [f, d] of support()) {
+				await b.createResourceFile(`support/${f}`, d);
+			}
 			await b.copyResourceFile(
 				'matanuionlinegame.swf',
 				'src/projector/matanuionlinegame.swf'
@@ -185,9 +184,9 @@ async function browser(dest) {
 		const data = await entry.read();
 		await fse.outputFile(`${dest}/${entry.path}`, data);
 	});
-	await generate(async (path, data) => {
-		await fse.outputFile(`${dest}/support/${path}`, data);
-	});
+	for await (const [f, d] of support()) {
+		await fse.outputFile(`${dest}/support/${f}`, d);
+	}
 	await Promise.all([
 		'matanuionlinegame.swf',
 		'matanuionlinegame-30fps.swf',
@@ -379,7 +378,10 @@ gulp.task('dist:mac:tgz', async () => {
 
 gulp.task('dist:mac:dmg', async () => {
 	const background = 'res/dmg-background/dmg-background.png';
-	const {width, height} = await imageSize(background);
+	const size = {
+		width: 640,
+		height: 512
+	};
 	const output = `dist/${distName}-Mac.dmg`;
 	const icon = `${output}.icns`;
 	await fse.outputFile(icon, await readIcns('res/dmg-icon.iconset'));
@@ -390,26 +392,23 @@ gulp.task('dist:mac:dmg', async () => {
 		icon,
 		background,
 		window: {
-			size: {
-				width,
-				height
-			}
+			size
 		},
 		contents: [
 			{
-				x: (width / 2) - 160,
+				x: (size.width / 2) - 160,
 				y: 108,
 				type: 'file',
 				path: `build/mac/${appFile}.app`
 			},
 			{
-				x: (width / 2) + 160,
+				x: (size.width / 2) + 160,
 				y: 108,
 				type: 'link',
 				path: '/Applications'
 			},
 			{
-				x: (width / 2),
+				x: (size.width / 2),
 				y: 364,
 				type: 'file',
 				path: 'build/mac/README.html'
