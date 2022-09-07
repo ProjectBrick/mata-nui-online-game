@@ -26,121 +26,61 @@ import {
 	versionShort,
 	distName
 } from './util/meta.mjs';
-import {
-	pngs2bmps,
-	readIco,
-	readIcns
-} from './util/image.mjs';
+import {pngs2bmps, readIco, readIcns} from './util/image.mjs';
 import {docs} from './util/doc.mjs';
-import {
-	makeZip,
-	makeTgz,
-	makeExe,
-	makeDmg
-} from './util/dist.mjs';
+import {makeZip, makeTgz, makeExe, makeDmg} from './util/dist.mjs';
 import {templateStrings} from './util/string.mjs';
 import {Propercase} from './util/propercase.mjs';
-import {
-	SourceZip,
-	SourceDir
-} from './util/source.mjs';
-import {setFps} from './util/fps.mjs';
+import {SourceZip, SourceDir} from './util/source.mjs';
+import {flash4FpsCap, setFps} from './util/fps.mjs';
 import {support} from './support/support.mjs';
 
-// This was a Flash 4 game, and the maximum FPS in Flash Player 4 was 18.
-// The FPS set in the SWF files is greater, leading to faster playback.
-// http://www.macromedia.com/support/flash/releasenotes/player/releasenotes_player_5.htm
-const correctFps = 18;
-
-const sources = {
-	'mod': () => new SourceDir(
-		'mod'
-	),
-	'templar': () => new SourceZip(
-		'original/templar/mnog.zip',
-		'mnog/'
-	),
-	'lego-2001-03-15': () => new SourceZip(
-		'original/lego/2001-03-15.zip',
-		'2001-03-15/'
-	),
-	'lego-2002-02-20': () => new SourceZip(
-		'original/lego/2002-02-20.zip',
-		'2002-02-20/'
-	),
-	'lego-re-release-episodes': () => new SourceZip(
-		'original/lego-re-release/episodes.zip',
-		''
-	)
-};
-
-async function readSources(order, each) {
+async function * readSources(sources) {
 	const propercase = new Propercase('propercase.txt');
 	propercase.cacheDir = '.cache/propercase';
 	await propercase.init();
-
-	const ordered = order.map(id => ({
-		id,
-		source: sources[id]()
-	}));
-	for (const {source} of ordered) {
-		await source.open();
-	}
-
-	const mapped = new Map();
-	for (const {id, source} of ordered) {
-		await source.each(async entry => {
-			const p = entry.path.toLowerCase();
-			if (p.endsWith('/') || mapped.has(p)) {
-				return;
-			}
-			mapped.set(p, {
-				source: id,
-				path: propercase.name(entry.path),
-				read: async () => {
-					let data = await entry.read();
-					if (/\.(swf|txt)$/i.test(p)) {
-						data = await propercase.dataCached(data);
-					}
-					if (/\.swf$/i.test(p)) {
-						setFps(data, correctFps);
-					}
-					return data;
+	await Promise.all(sources.map(s => s.open()));
+	const m = new Map();
+	for (const source of sources) {
+		for (const [path, read] of source.itter()) {
+			m.set(path.toLowerCase(), [propercase.name(path), async () => {
+				let data = await read();
+				if (/\.(swf|txt)$/i.test(p)) {
+					data = await propercase.dataCached(data);
 				}
-			});
-		});
+				if (/\.swf$/i.test(p)) {
+					setFps(data, flash4FpsCap);
+				}
+				return data;
+			}]);
+		}
 	}
-	for (const id of [...mapped.keys()].sort()) {
-		await each(mapped.get(id));
+	for (const id of [...m.keys()].sort()) {
+		yield m.get(id);
 	}
-
-	for (const {source} of ordered) {
-		await source.close();
-	}
+	await Promise.all(sources.map(s => s.close()));
 }
 
-async function readSourcesFiltered(each) {
+async function * readSourcesFiltered() {
 	const ignored = new Set([
 		'border.jpg',
 		'Launcher.swf',
 		'Launcher-full.swf'
 	]);
-	const sources = [
-		'mod',
-		'templar',
-		'lego-2001-03-15',
-		'lego-2002-02-20',
-		'lego-re-release-episodes'
-	];
-	await readSources(sources, async entry => {
+	for await (const [file, read] of readSources([
+		new SourceDir('mod'),
+		new SourceZip('original/templar/mnog.zip', 'mnog/'),
+		new SourceZip('original/lego/2001-03-15.zip', '2001-03-15/'),
+		new SourceZip('original/lego/2002-02-20.zip', '2002-02-20/'),
+		new SourceZip('original/lego-re-release/episodes.zip', '')
+	])) {
 		if (
-			ignored.has(entry.path) ||
-			!/^[^.][^\\/]+\.(swf|txt|bin|zip|jpe?g)$/i.test(entry.path)
+			!ignored.has(file) &&
+			/^[^.][^\\/]+\.(swf|txt|bin|zip|jpe?g)$/i.test(file)
 		) {
-			return;
+			yield [file, read];
 		}
-		await each(entry);
-	});
+	}
 }
 
 async function bundle(bundle, pkg, delay = false) {
@@ -153,9 +93,9 @@ async function bundle(bundle, pkg, delay = false) {
 		await (new Manager()).with(m => m.packageInstallFile(pkg)),
 		loader(swfv, w, h, fps, bg, url, delay ? Math.round(fps / 2) : 0),
 		async b => {
-			await readSourcesFiltered(async entry => {
-				await b.createResourceFile(entry.path, await entry.read());
-			});
+			for await (const [file, read] of readSourcesFiltered()) {
+				await b.createResourceFile(file, await read());
+			}
 			for await (const [f, d] of support()) {
 				await b.createResourceFile(`support/${f}`, d);
 			}
@@ -180,10 +120,9 @@ async function bundle(bundle, pkg, delay = false) {
 }
 
 async function browser(dest) {
-	await readSourcesFiltered(async entry => {
-		const data = await entry.read();
-		await fse.outputFile(`${dest}/${entry.path}`, data);
-	});
+	for await (const [file, read] of readSourcesFiltered()) {
+		await fse.outputFile(`${dest}/${file}`, await read());
+	}
 	for await (const [f, d] of support()) {
 		await fse.outputFile(`${dest}/support/${f}`, d);
 	}

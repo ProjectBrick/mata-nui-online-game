@@ -13,7 +13,7 @@ export class Source extends Object {
 	async close() {
 		throw new Error('Must subclass');
 	}
-	async each(each) {
+	* itter() {
 		throw new Error('Must subclass');
 	}
 }
@@ -51,38 +51,32 @@ export class SourceZip extends Source {
 		this._zipfile = null;
 		this._entries = null;
 	}
-	async each(each) {
+	* itter() {
 		const zipfile = this._zipfile;
 		const {base} = this;
 		for (const entry of this._entries) {
-			const {fileName} = entry;
-			if (/[\\\/]$/.test(fileName)) {
-				continue;
-			}
-			if (fileName.startsWith(base)) {
-				await each({
-					path: fileName.substr(base.length),
-					read: async () => {
-						const stream = await new Promise((resolve, reject) => {
-							zipfile.openReadStream(entry, (err, stream) => {
-								if (err) {
-									reject(err);
-									return;
-								}
-								resolve(stream);
-							})
+			const fileName = entry.fileName.replace(/\\/g, '/');
+			if (!fileName.endsWith('/') && fileName.startsWith(base)) {
+				yield [fileName.substr(base.length), async () => {
+					const stream = await new Promise((resolve, reject) => {
+						zipfile.openReadStream(entry, (err, stream) => {
+							if (err) {
+								reject(err);
+								return;
+							}
+							resolve(stream);
+						})
+					});
+					const datas = [];
+					await new Promise((resolve, reject) => {
+						stream.on('error', reject);
+						stream.on('end', resolve);
+						stream.on('data', data => {
+							datas.push(data);
 						});
-						const datas = [];
-						await new Promise((resolve, reject) => {
-							stream.on('error', reject);
-							stream.on('end', resolve);
-							stream.on('data', data => {
-								datas.push(data);
-							});
-						});
-						return Buffer.concat(datas);
-					}
-				});
+					});
+					return Buffer.concat(datas);
+				}];
 			}
 		}
 	}
@@ -127,19 +121,10 @@ export class SourceDir extends Source {
 	async close() {
 		this._entries = null;
 	}
-	async each(each) {
-		for (const entry of this._entries) {
-			if (entry.dirent.isFile()) {
-				await each({
-					path: entry.path,
-					read: async () => readFile(`${this.path}/${entry.path}`)
-				});
-			}
-			else if (entry.dirent.isDirectory()) {
-				await each({
-					path: `${entry.path}/`,
-					read: null
-				});
+	* itter() {
+		for (const {path, dirent} of this._entries) {
+			if (dirent.isFile()) {
+				yield [path, async () => readFile(`${this.path}/${path}`)];
 			}
 		}
 	}
