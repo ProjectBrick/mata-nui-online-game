@@ -21,10 +21,10 @@ async function readTokens(file) {
 
 function firstHeader(body) {
 	const m = body.match(/<h\d[^>]*>([\s\S]*?)<\/h\d>/);
-	if (!m || !m[0]) {
+	if (!m || !m[1]) {
 		throw new Error('No title');
 	}
-	return m[0];
+	return m[1];
 }
 
 export async function docs(src, dst) {
