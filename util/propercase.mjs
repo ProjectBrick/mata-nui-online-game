@@ -23,6 +23,7 @@ export class Propercase extends Object {
 				.sort((a, b) => a.length - b.length)
 				.map(s => [s.toLowerCase(), s])
 		);
+
 		const cacheDir = this._cacheDir;
 		if (cacheDir) {
 			await mkdir(cacheDir, {recursive: true});
@@ -78,5 +79,11 @@ export class Propercase extends Object {
 		await writeFile(tmp, d);
 		await rename(tmp, file);
 		return d;
+	}
+
+	static async init(path, cacheDir = null) {
+		const r = new Propercase(path, cacheDir);
+		await r.init();
+		return r;
 	}
 }

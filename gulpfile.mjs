@@ -36,8 +36,7 @@ import {flash4FpsCap, setFps} from './util/fps.mjs';
 import {support} from './support/support.mjs';
 
 async function * files() {
-	const propercase = new Propercase('propercase.txt', '.cache/propercase');
-	await propercase.init();
+	const pc = await Propercase.init('propercase.txt', '.cache/propercase');
 	for await (const [file, read] of readSources([
 		new SourceDir('mod'),
 		new SourceZip('original/templar/mnog.zip', 'mnog/'),
@@ -51,12 +50,12 @@ async function * files() {
 		) {
 			let data = await read();
 			if (/\.(swf|txt)$/i.test(file)) {
-				data = await propercase.dataCached(data);
+				data = await pc.dataCached(data);
 			}
 			if (/\.swf$/i.test(file)) {
 				setFps(data, flash4FpsCap);
 			}
-			yield [propercase.name(file), data];
+			yield [pc.name(file), data];
 		}
 	}
 	for await (const [file, data] of support()) {
