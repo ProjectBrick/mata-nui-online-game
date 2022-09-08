@@ -135,7 +135,10 @@ export async function * readSources(sources) {
 	const m = new Map();
 	for (const source of sources) {
 		for (const [path, read] of source.itter()) {
-			m.set(path.toLowerCase(), [path, read]);
+			const id = path.toLowerCase();
+			if (!m.has(id)) {
+				m.set(id, [path, read]);
+			}
 		}
 	}
 	for (const id of [...m.keys()].sort()) {
