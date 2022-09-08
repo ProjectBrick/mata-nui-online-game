@@ -14,7 +14,7 @@ function findFps(data) {
 	return rectOff + rectBytes
 }
 
-export function getFps(data, fps) {
+export function getFps(data) {
 	return data.readUInt16BE(findFps(data));
 }
 
