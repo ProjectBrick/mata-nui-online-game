@@ -31,42 +31,14 @@ import {docs} from './util/doc.mjs';
 import {makeZip, makeTgz, makeExe, makeDmg} from './util/dist.mjs';
 import {templateStrings} from './util/string.mjs';
 import {Propercase} from './util/propercase.mjs';
-import {SourceZip, SourceDir} from './util/source.mjs';
+import {SourceZip, SourceDir, readSources} from './util/source.mjs';
 import {flash4FpsCap, setFps} from './util/fps.mjs';
 import {support} from './support/support.mjs';
 
-async function * readSources(sources) {
+async function * files() {
 	const propercase = new Propercase('propercase.txt');
 	propercase.cacheDir = '.cache/propercase';
 	await propercase.init();
-	await Promise.all(sources.map(s => s.open()));
-	const m = new Map();
-	for (const source of sources) {
-		for (const [path, read] of source.itter()) {
-			m.set(path.toLowerCase(), [propercase.name(path), async () => {
-				let data = await read();
-				if (/\.(swf|txt)$/i.test(path)) {
-					data = await propercase.dataCached(data);
-				}
-				if (/\.swf$/i.test(path)) {
-					setFps(data, flash4FpsCap);
-				}
-				return data;
-			}]);
-		}
-	}
-	for (const id of [...m.keys()].sort()) {
-		yield m.get(id);
-	}
-	await Promise.all(sources.map(s => s.close()));
-}
-
-async function * readSourcesFiltered() {
-	const ignored = new Set([
-		'border.jpg',
-		'Launcher.swf',
-		'Launcher-full.swf'
-	]);
 	for await (const [file, read] of readSources([
 		new SourceDir('mod'),
 		new SourceZip('original/templar/mnog.zip', 'mnog/'),
@@ -75,11 +47,21 @@ async function * readSourcesFiltered() {
 		new SourceZip('original/lego-re-release/episodes.zip', '')
 	])) {
 		if (
-			!ignored.has(file) &&
+			!/^(border\.jpg|Launcher(-full)?\.swf)$/i.test(file) &&
 			/^[^.][^\\/]+\.(swf|txt|bin|zip|jpe?g)$/i.test(file)
 		) {
-			yield [file, read];
+			let data = await read();
+			if (/\.(swf|txt)$/i.test(file)) {
+				data = await propercase.dataCached(data);
+			}
+			if (/\.swf$/i.test(file)) {
+				setFps(data, flash4FpsCap);
+			}
+			yield [propercase.name(file), data];
 		}
+	}
+	for await (const [file, data] of support()) {
+		yield [`support/${file}`, data];
 	}
 }
 
@@ -93,11 +75,8 @@ async function bundle(bundle, pkg, delay = false) {
 		await (new Manager()).with(m => m.packageInstallFile(pkg)),
 		loader(swfv, w, h, fps, bg, url, delay ? Math.round(fps / 2) : 0),
 		async b => {
-			for await (const [file, read] of readSourcesFiltered()) {
-				await b.createResourceFile(file, await read());
-			}
-			for await (const [f, d] of support()) {
-				await b.createResourceFile(`support/${f}`, d);
+			for await (const [file, data] of files()) {
+				await b.createResourceFile(file, data);
 			}
 			await b.copyResourceFile(
 				'matanuionlinegame.swf',
@@ -120,11 +99,8 @@ async function bundle(bundle, pkg, delay = false) {
 }
 
 async function browser(dest) {
-	for await (const [file, read] of readSourcesFiltered()) {
-		await fse.outputFile(`${dest}/${file}`, await read());
-	}
-	for await (const [f, d] of support()) {
-		await fse.outputFile(`${dest}/support/${f}`, d);
+	for await (const [file, data] of files()) {
+		await fse.outputFile(`${dest}/${file}`, data);
 	}
 	await Promise.all([
 		'matanuionlinegame.swf',
