@@ -1,4 +1,4 @@
-import {mkdir, readFile, rename, stat, writeFile} from 'fs/promises';
+import {mkdir, readFile, rename, writeFile} from 'fs/promises';
 import {createHash} from 'crypto';
 
 function hash(data) {
@@ -6,11 +6,10 @@ function hash(data) {
 }
 
 export class Propercase extends Object {
-	constructor(path, encoding = 'utf8') {
+	constructor(path, cacheDir = null) {
 		super();
 		this.path = path;
-		this.encoding = encoding;
-		this.cacheDir = null;
+		this._cacheDir = cacheDir;
 		this._map = null;
 	}
 
@@ -18,12 +17,16 @@ export class Propercase extends Object {
 		// Sorted shortest first, so shorter replaces are replaced by longer.
 		// Skip lines that start with slash, a comment.
 		this._map = new Map(
-			(await readFile(this.path, this.encoding))
+			(await readFile(this.path, 'ascii'))
 				.split(/[\r\n]+/)
 				.filter(s => s && !s.startsWith('/'))
 				.sort((a, b) => a.length - b.length)
 				.map(s => [s.toLowerCase(), s])
 		);
+		const cacheDir = this._cacheDir;
+		if (cacheDir) {
+			await mkdir(cacheDir, {recursive: true});
+		}
 	}
 
 	name(str) {
@@ -31,8 +34,6 @@ export class Propercase extends Object {
 	}
 
 	data(data) {
-		const {encoding} = this;
-
 		// Make lowercase copy of the data to search.
 		const dataLower = Buffer.concat([data]);
 		for (let i = dataLower.length; i--;) {
@@ -45,28 +46,32 @@ export class Propercase extends Object {
 		// Search for matches and replace in original data.
 		for (const [k, v] of this._map) {
 			for (let i = 0; i < dataLower.length;) {
-				i = dataLower.indexOf(k, i, encoding);
+				i = dataLower.indexOf(k, i, 'ascii');
 				if (i < 0) {
 					break;
 				}
-				data.write(v, i, encoding);
+				data.write(v, i, 'ascii');
 				i += k.length;
 			}
 		}
 	}
 
 	async dataCached(data) {
-		const {cacheDir} = this;
+		const cacheDir = this._cacheDir;
 		if (!cacheDir) {
-			throw new Error('Cache directory not set');
+			throw new Error('No cache dir set');
 		}
 
 		const file = `${cacheDir}/${hash(data)}`;
-		if (await stat(file).catch(() => null)) {
-			return readFile(file);
+		try {
+			return await readFile(file);
+		}
+		catch (err) {
+			if (err.code !== 'ENOENT') {
+				throw err;
+			}
 		}
 
-		await mkdir(cacheDir, {recursive: true});
 		const d = Buffer.concat([data]);
 		this.data(d);
 		const tmp = `${file}.tmp`;

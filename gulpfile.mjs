@@ -36,8 +36,7 @@ import {flash4FpsCap, setFps} from './util/fps.mjs';
 import {support} from './support/support.mjs';
 
 async function * files() {
-	const propercase = new Propercase('propercase.txt');
-	propercase.cacheDir = '.cache/propercase';
+	const propercase = new Propercase('propercase.txt', '.cache/propercase');
 	await propercase.init();
 	for await (const [file, read] of readSources([
 		new SourceDir('mod'),
