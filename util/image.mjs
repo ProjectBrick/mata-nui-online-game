@@ -1,19 +1,6 @@
 import {readdir, readFile} from 'fs/promises';
 
-import Jimp from 'jimp';
 import {IconIco, IconIcns} from '@shockpkg/icon-encoder';
-
-export async function pngs2bmps(inDir, outDir) {
-	await Promise.all((await readdir(inDir))
-		.filter(f => /^[^\.].*\.png$/i.test(f))
-		.map(f => Jimp
-			.read(`${inDir}/${f}`)
-			.then(i => i.write(
-				`${outDir}/${f}`.replace(/\.png$/i, '.bmp')
-			))
-		)
-	);
-}
 
 export async function readIco(iconset) {
 	const ico = new IconIco();

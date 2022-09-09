@@ -26,7 +26,7 @@ import {
 	versionShort,
 	distName
 } from './util/meta.mjs';
-import {pngs2bmps, readIco, readIcns} from './util/image.mjs';
+import {readIco, readIcns} from './util/image.mjs';
 import {docs} from './util/doc.mjs';
 import {makeZip, makeTgz, makeExe, makeDmg} from './util/dist.mjs';
 import {copyFile, outputFile, remove} from './util/fs.mjs';
@@ -254,14 +254,8 @@ task['dist:windows:exe'] = async () => {
 	await remove(target);
 	const res = `${target}.res`;
 	const resIcon = `${res}/icon.ico`;
-	const resHeaders = `${res}/headers`;
-	const resSidebars = `${res}/sidebars`;
 	await remove(res);
-	await Promise.all([
-		readIco('res/inno-icon').then(d => outputFile(resIcon, d)),
-		pngs2bmps('res/inno-header', resHeaders),
-		pngs2bmps('res/inno-sidebar', resSidebars),
-	]);
+	await readIco('res/inno-icon').then(d => outputFile(resIcon, d));
 	await makeExe('innosetup.iss', {
 		VarId: appDomain,
 		VarName: appName,
@@ -271,8 +265,8 @@ task['dist:windows:exe'] = async () => {
 		VarCopyright: copyright,
 		VarLicense: 'LICENSE.txt',
 		VarIcon: resIcon,
-		VarWizardImageHeader: `${resHeaders}/*.bmp`,
-		VarWizardImageSidebar: `${resSidebars}/*.bmp`,
+		VarWizardImageHeader: 'res/inno-header/*.bmp',
+		VarWizardImageSidebar: 'res/inno-sidebar/*.bmp',
 		VarWizardImageAlphaFormat: 'none',
 		VarExeName: `${appFile}.exe`,
 		VarOutDir: outDir,
