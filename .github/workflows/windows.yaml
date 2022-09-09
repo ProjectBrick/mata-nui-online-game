@@ -24,19 +24,19 @@ jobs:
 
       - name: shockpkg
         run: |
-          npm run shockpkg -- update --summary
-          npm run shockpkg -- install \
+          npm exec shockpkg -- update --summary
+          npm exec shockpkg -- install \
             flash-player-32.0.0.465-windows-sa-debug
         shell: bash
 
       - name: Build
-        run: npm run build:windows
+        run: node make.mjs build:windows
 
       - name: Dist zip
-        run: npm run dist:windows:zip
+        run: node make.mjs dist:windows:zip
 
       - name: Dist exe
-        run: npm run dist:windows:exe
+        run: node make.mjs dist:windows:exe
 
       - name: Artifact build
         uses: actions/upload-artifact@v3

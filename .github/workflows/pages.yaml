@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build:pages
+        run: node make.mjs build:pages
 
       - name: Artifact build
         uses: actions/upload-artifact@v3

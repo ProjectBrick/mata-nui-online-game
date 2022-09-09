@@ -24,19 +24,19 @@ jobs:
 
       - name: shockpkg
         run: |
-          npm run shockpkg -- update --summary
-          npm run shockpkg -- install \
+          node make.mjs shockpkg -- update --summary
+          node make.mjs shockpkg -- install \
             flash-player-32.0.0.465-mac-sa-debug-zip
         shell: bash
 
       - name: Build
-        run: npm run build:mac
+        run: node make.mjs build:mac
 
       - name: Dist tgz
-        run: npm run dist:mac:tgz
+        run: node make.mjs dist:mac:tgz
 
       - name: Dist dmg
-        run: npm run dist:mac:dmg
+        run: node make.mjs dist:mac:dmg
 
       - name: Artifact build
         uses: actions/upload-artifact@v3

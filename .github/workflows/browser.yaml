@@ -23,13 +23,13 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build:browser
+        run: node make.mjs build:browser
 
       - name: Dist zip
-        run: npm run dist:browser:zip
+        run: node make.mjs dist:browser:zip
 
       - name: Dist tgz
-        run: npm run dist:browser:tgz
+        run: node make.mjs dist:browser:tgz
 
       - name: Artifact build
         uses: actions/upload-artifact@v3

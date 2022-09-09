@@ -24,23 +24,23 @@ jobs:
 
       - name: shockpkg
         run: |
-          npm run shockpkg -- update --summary
-          npm run shockpkg -- install \
+          npm exec shockpkg -- update --summary
+          npm exec shockpkg -- install \
             flash-player-11.2.202.644-linux-i386-sa-debug \
             flash-player-32.0.0.465-linux-x86_64-sa-debug
         shell: bash
 
       - name: Build i386
-        run: npm run build:linux-i386
+        run: node make.mjs build:linux-i386
 
       - name: Build x86_64
-        run: npm run build:linux-x86_64
+        run: node make.mjs build:linux-x86_64
 
       - name: Dist i386 tgz
-        run: npm run dist:linux-i386:tgz
+        run: node make.mjs dist:linux-i386:tgz
 
       - name: Dist x86_64 tgz
-        run: npm run dist:linux-x86_64:tgz
+        run: node make.mjs dist:linux-x86_64:tgz
 
       - name: Artifact build
         uses: actions/upload-artifact@v3
