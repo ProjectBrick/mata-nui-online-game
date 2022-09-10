@@ -11,7 +11,6 @@
 	"dependencies": {
 		"@shockpkg/cli": "^2.0.0",
 		"@shockpkg/core": "^2.0.0",
-		"@shockpkg/icon-encoder": "^2.0.0",
 		"@shockpkg/plist-dom": "^3.0.0",
 		"@shockpkg/swf-projector": "^3.0.1",
 		"archiver": "^5.3.1",
