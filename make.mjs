@@ -249,8 +249,7 @@ task['dist:windows:zip'] = async () => {
 task['dist:windows:exe'] = async () => {
 	const outDir = 'dist';
 	const outFile = `${distName}-Windows`;
-	const target = `${outDir}/${outFile}.exe`;
-	await remove(target);
+	await remove(`${outDir}/${outFile}.exe`);
 	await makeExe('innosetup.iss', {
 		VarId: appDomain,
 		VarName: appName,
@@ -279,29 +278,27 @@ task['dist:mac:tgz'] = async () => {
 };
 
 task['dist:mac:dmg'] = async () => {
-	const background = 'res/dmg-background/dmg-background.png';
-	const size = {
-		width: 640,
-		height: 512
-	};
 	await makeDmg(`dist/${distName}-Mac.dmg`, {
 		format: 'UDBZ',
 		title: appDmgTitle,
 		'icon-size': 128,
 		icon: 'res/dmg-icon.icns',
-		background,
+		background: 'res/dmg-background/dmg-background.png',
 		window: {
-			size
+			size: {
+				width: 640,
+				height: 512
+			}
 		},
 		contents: [
 			{
-				x: (size.width / 2) - 160,
+				x: 160,
 				y: 108,
 				type: 'file',
 				path: `build/mac/${appFile}.app`
 			},
 			{
-				x: (size.width / 2) + 160,
+				x: 480,
 				y: 108,
 				type: 'link',
 				path: '/Applications'
