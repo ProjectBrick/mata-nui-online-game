@@ -304,7 +304,7 @@ task['dist:mac:dmg'] = async () => {
 				path: '/Applications'
 			},
 			{
-				x: (size.width / 2),
+				x: 320,
 				y: 364,
 				type: 'file',
 				path: 'build/mac/README.html'
