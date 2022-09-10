@@ -41,7 +41,15 @@ export async function makeTgz(target, source) {
 	);
 }
 
-export async function makeDmg(target, specification) {
+export async function makeDmg(
+	target,
+	title,
+	icon,
+	background,
+	size,
+	iconSize,
+	contents
+) {
 	const {default: appdmg} = await import('appdmg');
 	await rm(target, {force: true});
 	await mkdir(dirname(target), {recursive: true});
@@ -49,7 +57,25 @@ export async function makeDmg(target, specification) {
 		const dmg = appdmg({
 			basepath: '.',
 			target,
-			specification
+			specification: {
+				format: 'UDBZ',
+				title,
+				'icon-size': iconSize,
+				icon,
+				background,
+				window: {
+					size: {
+						width: size[0],
+						height: size[1]
+					}
+				},
+				contents: contents.map(([x, y, type, path]) => ({
+					x,
+					y,
+					type,
+					path
+				}))
+			}
 		});
 		dmg.on('error', reject);
 		dmg.on('finish', resolve);
