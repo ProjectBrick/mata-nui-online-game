@@ -71,8 +71,8 @@ export async function makeDmg(
 					}
 				},
 				contents: contents.map(([x, y, type, path]) => ({
-					x,
-					y,
+					x: (size[0] / 2) + x,
+					y: (size[1] / 2) + y,
 					type,
 					path
 				}))
@@ -108,12 +108,9 @@ export async function makeExe(
 	icons
 ) {
 	const _ = (tpl, ...vars) => {
-		const p = [];
-		for (let i = 0; i < tpl.length; i++) {
-			if (i) {
-				p.push(String(vars[i - 1]).replace(/["{]/g, s => s + s));
-			}
-			p.push(tpl[i]);
+		const p = [tpl[0]];
+		for (let i = 1; i < tpl.length; i++) {
+			p.push(String(vars[i - 1]).replace(/["{]/g, s => s + s), tpl[i]);
 		}
 		return `"${p.join('')}"`;
 	};
@@ -143,12 +140,12 @@ export async function makeExe(
 			SolidCompression: _`yes`,
 			WizardStyle: _`modern`,
 			ArchitecturesInstallIn64BitMode: _``,
-			ArchitecturesAllowed: _``,
+			ArchitecturesAllowed: _``
 		},
 		Languages: [
 			{
 				Name: _`english`,
-				MessagesFile: _`compiler:Default.isl`,
+				MessagesFile: _`compiler:Default.isl`
 			}
 		],
 		Tasks: [
