@@ -1,12 +1,13 @@
+import {createRequire} from 'module';
 import {createWriteStream} from 'fs';
 import {readdir, mkdir, rm} from 'fs/promises';
-import {dirname} from 'path';
+import {basename, dirname} from 'path';
 import {promisify} from 'util';
 import {pipeline} from 'stream';
+import {spawn} from 'child_process';
 
 import archiver from 'archiver';
 import tar from 'tar';
-import innosetup from 'innosetup';
 
 const pipe = promisify(pipeline);
 
@@ -50,8 +51,8 @@ export async function makeDmg(
 	iconSize,
 	contents
 ) {
-	const {default: appdmg} = await import('appdmg');
 	await rm(target, {force: true});
+	const {default: appdmg} = await import('appdmg');
 	await mkdir(dirname(target), {recursive: true});
 	await new Promise((resolve, reject) => {
 		const dmg = appdmg({
@@ -82,20 +83,129 @@ export async function makeDmg(
 	});
 }
 
-export async function makeExe(iss, vars) {
+function createIss(config) {
+	return '\ufeff' + Object.entries(config).map(([s, p]) => {
+		const rows = Array.isArray(p) ?
+			p.map(o => Object.entries(o).map(a => a.join(': ')).join('; ')) :
+			Object.entries(p).map(a => a.join('='));
+		return `[${s}]\n${rows.join('\n')}\n`;
+	}).join('\n');
+}
+
+export async function makeExe(
+	target,
+	id,
+	name,
+	file,
+	version,
+	publisher,
+	copyright,
+	license,
+	icon,
+	header,
+	sidebar,
+	source,
+	icons
+) {
+	const _ = (tpl, ...vars) => {
+		const p = [];
+		for (let i = 0; i < tpl.length; i++) {
+			if (i) {
+				p.push(String(vars[i - 1]).replace(/["{]/g, s => s + s));
+			}
+			p.push(tpl[i]);
+		}
+		return `"${p.join('')}"`;
+	};
+	const __ = s => s.replace(/[%,|}]/g, encodeURIComponent);
+	const ___ = s => __(s.replaceAll('&', '&&'));
+	await rm(target, {force: true});
+	const iss = createIss({
+		Setup: {
+			AppId: _`${id}`,
+			AppName: _`${name}`,
+			AppVersion: _`${version}`,
+			VersionInfoVersion: _`${version}`,
+			AppPublisher: _`${publisher}`,
+			AppCopyright: _`${copyright}`,
+			DefaultDirName: _`{autopf}\\${file}`,
+			DefaultGroupName: _`${file}`,
+			AllowNoIcons: _`yes`,
+			LicenseFile: _`${license}`,
+			SetupIconFile: _`${icon}`,
+			WizardSmallImageFile: _`${header}`,
+			WizardImageFile: _`${sidebar}`,
+			WizardImageAlphaFormat: _`none`,
+			PrivilegesRequiredOverridesAllowed: _`dialog`,
+			OutputDir: _`${dirname(target)}`,
+			OutputBaseFilename: _`${basename(target).replace(/\.exe$/i, '')}`,
+			Compression: _`lzma`,
+			SolidCompression: _`yes`,
+			WizardStyle: _`modern`,
+			ArchitecturesInstallIn64BitMode: _``,
+			ArchitecturesAllowed: _``,
+		},
+		Languages: [
+			{
+				Name: _`english`,
+				MessagesFile: _`compiler:Default.isl`,
+			}
+		],
+		Tasks: [
+			{
+				Name: _`desktopicon`,
+				Description: _`{cm:CreateDesktopIcon}`,
+				GroupDescription: _`{cm:AdditionalIcons}`
+			}
+		],
+		Files: [
+			{
+				Source: _`${source}`,
+				DestDir: _`{app}`,
+				Flags: 'ignoreversion recursesubdirs createallsubdirs'
+			}
+		],
+		Icons: [
+			...icons.map(([file, name]) => ({
+				Name: _`{group}\\${name}`,
+				Filename: _`{app}\\${file}`
+			})),
+			...icons.filter(a => a[2]).map(([file, name]) => ({
+				Name: _`{autodesktop}\\${name}`,
+				Filename: _`{app}\\${file}`,
+				Tasks: 'desktopicon'
+			})),
+			{
+				Name: _`{group}\\{cm:UninstallProgram,${__(file)}}`,
+				Filename: _`{uninstallexe}`
+			}
+		],
+		Run: icons.filter(a => a[3]).map(([file, name]) => ({
+			Filename: _`{app}\\${file}`,
+			Description: _`{cm:LaunchProgram,${___(name)}}`,
+			Flags: 'nowait postinstall skipifsilent'
+		}))
+	});
+	const require = createRequire(import.meta.url);
+	const argv = /^win/.test(process.platform) ? [] : ['wine'];
+	const iscc = require.resolve('innosetup/bin/ISCC.exe');
+	argv.push(iscc);
+	argv.push('/q');
+	argv.push('-');
 	await new Promise((resolve, reject) => {
-		innosetup(iss, {
-			gui: false,
-			verbose: false,
-			...Object.fromEntries(
-				Object.entries(vars).map(([k, v]) => ([`D${k}`, v]))
-			)
-		}, err => {
-			if (err) {
-				reject(err);
+		const p = spawn(argv[0], argv.slice(1));
+		const stderr = [];
+		p.stderr.on('data', data => {
+			stderr.push(data);
+		});
+		p.on('exit', code => {
+			if (code) {
+				const err = Buffer.concat(stderr).toString('utf8').trim();
+				reject(new Error(`${basename(iscc)}: ${code}: ${err}`));
 				return;
 			}
 			resolve();
 		});
-	})
+		p.stdin.end(Buffer.from(iss));
+	});
 }
