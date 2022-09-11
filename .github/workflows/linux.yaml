@@ -26,8 +26,8 @@ jobs:
         run: |
           npm exec shockpkg -- update --summary
           npm exec shockpkg -- install \
-            flash-player-11.2.202.644-linux-i386-sa-debug \
-            flash-player-32.0.0.465-linux-x86_64-sa-debug
+            flash-player-11.2.202.644-linux-i386-sa \
+            flash-player-32.0.0.465-linux-x86_64-sa
         shell: bash
 
       - name: Build i386

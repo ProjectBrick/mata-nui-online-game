@@ -26,7 +26,7 @@ jobs:
         run: |
           npm exec shockpkg -- update --summary
           npm exec shockpkg -- install \
-            flash-player-32.0.0.465-mac-sa-debug-zip
+            flash-player-32.0.0.465-mac-sa-zip
         shell: bash
 
       - name: Build
