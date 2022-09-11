@@ -30,13 +30,13 @@ jobs:
         shell: bash
 
       - name: Build
-        run: node make.mjs build:mac
+        run: node make.mjs build:mac-x86_64
 
       - name: Dist tgz
-        run: node make.mjs dist:mac:tgz
+        run: node make.mjs dist:mac-x86_64:tgz
 
       - name: Dist dmg
-        run: node make.mjs dist:mac:dmg
+        run: node make.mjs dist:mac-x86_64:dmg
 
       - name: Artifact build
         uses: actions/upload-artifact@v3
