@@ -140,6 +140,7 @@ export async function makeExe(
 			Compression: _`lzma`,
 			SolidCompression: _`yes`,
 			WizardStyle: _`modern`,
+			UninstallDisplayIcon: _`{uninstallexe}`,
 			ArchitecturesInstallIn64BitMode: _`${arch}`,
 			ArchitecturesAllowed: _`${arch}`
 		},
