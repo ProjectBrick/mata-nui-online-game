@@ -9,6 +9,7 @@ import {
 } from '@shockpkg/plist-dom';
 import {
 	BundleWindows32,
+	BundleWindows64,
 	BundleMacApp,
 	BundleLinux32,
 	BundleLinux64,
@@ -155,15 +156,17 @@ task['dist:browser:tgz'] = async () => {
 	await makeTgz(`dist/${distName}-Browser.tgz`, 'build/browser');
 };
 
-for (const [type, pkg] of [
-	['i386', 'flash-player-32.0.0.465-windows-sa'],
-	['i386-debug', 'flash-player-32.0.0.465-windows-sa-debug']
-]) {
+for (const [type, pkg] of Object.entries({
+	'i386': 'flash-player-35.0.0.204-windows-i386-sa-2022-08-13',
+	'x86_64': 'flash-player-35.0.0.204-windows-x86_64-sa-2022-08-13',
+	'x86_64-debug': 'flash-player-35.0.0.204-windows-x86_64-sa-debug-2022-08-13'
+})) {
 	const build = `build/windows-${type}`;
 	task[`build:windows-${type}`] = async () => {
 		await remove(build);
 		const file = `${appFile}.exe`;
-		const b = new BundleWindows32(`${build}/${file}`);
+		const Bundle = /x86_64/.test(type) ? BundleWindows64 : BundleWindows32;
+		const b = new Bundle(`${build}/${file}`);
 		b.projector.versionStrings = {
 			FileVersion: version,
 			ProductVersion: versionShort,
@@ -178,6 +181,7 @@ for (const [type, pkg] of [
 		};
 		b.projector.iconFile = 'res/app-icon-windows.ico';
 		b.projector.patchWindowTitle = appName;
+		b.projector.patchOutOfDateDisable = true;
 		b.projector.removeCodeSignature = true;
 		await bundle(b, pkg);
 		await docs('docs', build);
@@ -187,7 +191,8 @@ for (const [type, pkg] of [
 	};
 	task[`dist:windows-${type}:exe`] = async () => {
 		await makeExe(
-			`dist/${distName}-Windows.exe`,
+			`dist/${distName}-Windows-${type}.exe`,
+			/x86_64/.test(type) ? 'x64 arm64' : '',
 			appDomain,
 			appName,
 			appFile,
@@ -207,10 +212,10 @@ for (const [type, pkg] of [
 	};
 }
 
-for (const [type, pkg] of [
-	['x86_64', 'flash-player-32.0.0.465-mac-sa-zip'],
-	['x86_64-debug', 'flash-player-32.0.0.465-mac-sa-debug-zip']
-]) {
+for (const [type, pkg] of Object.entries({
+	'x86_64': 'flash-player-35.0.0.204-mac-x86_64-sa-2022-07-04',
+	'x86_64-debug': 'flash-player-35.0.0.204-mac-x86_64-sa-debug-2022-07-04'
+})) {
 	const build = `build/mac-${type}`;
 	task[`build:mac-${type}`] = async () => {
 		await remove(build);
@@ -270,18 +275,17 @@ for (const [type, pkg] of [
 	};
 }
 
-for (const [type, pkg] of [
-	['i386', 'flash-player-11.2.202.644-linux-i386-sa'],
-	['i386-debug', 'flash-player-11.2.202.644-linux-i386-sa-debug'],
-	['x86_64', 'flash-player-32.0.0.465-linux-x86_64-sa'],
-	['x86_64-debug', 'flash-player-32.0.0.465-linux-x86_64-sa-debug']
-]) {
+for (const [type, pkg] of Object.entries({
+	'i386': 'flash-player-11.2.202.644-linux-i386-sa',
+	'i386-debug': 'flash-player-11.2.202.644-linux-i386-sa-debug',
+	'x86_64': 'flash-player-32.0.0.465-linux-x86_64-sa',
+	'x86_64-debug': 'flash-player-32.0.0.465-linux-x86_64-sa-debug'
+})) {
 	const build = `build/linux-${type}`;
 	task[`build:linux-${type}`] = async () => {
 		await remove(build);
-		const b = new (/x86_64/.test(type) ? BundleLinux64 : BundleLinux32)(
-			`${build}/${appFile}`
-		);
+		const Bundle = /x86_64/.test(type) ? BundleLinux64 : BundleLinux32;
+		const b = new Bundle(`${build}/${appFile}`);
 		if (b instanceof BundleLinux64) {
 			b.projector.patchProjectorOffset = true;
 		}

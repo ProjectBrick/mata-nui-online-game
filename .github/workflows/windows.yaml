@@ -26,17 +26,27 @@ jobs:
         run: |
           npm exec shockpkg -- update --summary
           npm exec shockpkg -- install \
-            flash-player-32.0.0.465-windows-sa
+            flash-player-35.0.0.204-windows-i386-sa-2022-08-13 \
+            flash-player-35.0.0.204-windows-x86_64-sa-2022-08-13
         shell: bash
 
-      - name: Build
+      - name: Build i386
         run: node make.mjs build:windows-i386
 
-      - name: Dist zip
+      - name: Build x86_64
+        run: node make.mjs build:windows-x86_64
+
+      - name: Dist i386 zip
         run: node make.mjs dist:windows-i386:zip
 
-      - name: Dist exe
+      - name: Dist x86_64 zip
+        run: node make.mjs dist:windows-x86_64:zip
+
+      - name: Dist i386 exe
         run: node make.mjs dist:windows-i386:exe
+
+      - name: Dist x86_64 exe
+        run: node make.mjs dist:windows-x86_64:exe
 
       - name: Artifact build
         uses: actions/upload-artifact@v3

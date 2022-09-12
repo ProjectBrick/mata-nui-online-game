@@ -94,6 +94,7 @@ function createIss(config) {
 
 export async function makeExe(
 	target,
+	arch,
 	id,
 	name,
 	file,
@@ -139,8 +140,8 @@ export async function makeExe(
 			Compression: _`lzma`,
 			SolidCompression: _`yes`,
 			WizardStyle: _`modern`,
-			ArchitecturesInstallIn64BitMode: _``,
-			ArchitecturesAllowed: _``
+			ArchitecturesInstallIn64BitMode: _`${arch}`,
+			ArchitecturesAllowed: _`${arch}`
 		},
 		Languages: [
 			{
