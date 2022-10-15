@@ -8,11 +8,9 @@ import {
 	ValueBoolean
 } from '@shockpkg/plist-dom';
 import {
-	BundleWindows32,
-	BundleWindows64,
+	BundleWindows,
 	BundleMacApp,
-	BundleLinux32,
-	BundleLinux64,
+	BundleLinux,
 	loader
 } from '@shockpkg/swf-projector';
 
@@ -165,8 +163,7 @@ for (const [type, pkg] of Object.entries({
 	task[`build:windows-${type}`] = async () => {
 		await remove(build);
 		const file = `${appFile}.exe`;
-		const Bundle = /x86_64/.test(type) ? BundleWindows64 : BundleWindows32;
-		const b = new Bundle(`${build}/${file}`);
+		const b = new BundleWindows(`${build}/${file}`);
 		b.projector.versionStrings = {
 			FileVersion: version,
 			ProductVersion: versionShort,
@@ -284,11 +281,8 @@ for (const [type, pkg] of Object.entries({
 	const build = `build/linux-${type}`;
 	task[`build:linux-${type}`] = async () => {
 		await remove(build);
-		const Bundle = /x86_64/.test(type) ? BundleLinux64 : BundleLinux32;
-		const b = new Bundle(`${build}/${appFile}`);
-		if (b instanceof BundleLinux64) {
-			b.projector.patchProjectorOffset = true;
-		}
+		const b = new BundleLinux(`${build}/${appFile}`);
+		b.projector.patchProjectorOffset = /x86_64/.test(type);
 		b.projector.patchProjectorPath = true;
 		b.projector.patchWindowTitle = appName;
 		await bundle(b, pkg, true);
