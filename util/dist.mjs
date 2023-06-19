@@ -24,8 +24,7 @@ export async function makeZip(target, source) {
 	});
 	const done = pipe(archive, createWriteStream(target));
 	archive.directory(source, false);
-	archive.finalize();
-	await done;
+	await Promise.all([archive.finalize(), done]);
 }
 
 export async function makeTgz(target, source) {
