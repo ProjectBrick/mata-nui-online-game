@@ -2,6 +2,7 @@ import {readdir, readFile, stat, writeFile} from 'fs/promises';
 import {pathToFileURL} from 'url';
 
 import {marked} from 'marked';
+import {gfmHeadingId} from 'marked-gfm-heading-id';
 
 import {templateStrings} from './string.mjs';
 
@@ -35,12 +36,13 @@ export async function docs(src, dst) {
 		breaks: true,
 		smartypants: true
 	};
+	const ext = [gfmHeadingId({})];
 	await Promise.all(
 		(await readdir(src))
 			.filter(f => /^[^\.].*\.md$/i.test(f))
 			.sort()
 			.map(f => readFile(`${src}/${f}`, 'utf8').then(md => {
-				const body = marked(md, options).trim();
+				const body = marked.use(...ext)(md, options).trim();
 				const title = firstHeader(body);
 				return writeFile(
 					`${dst}/${f}`.replace(/\.md$/i, '.html'),
