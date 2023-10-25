@@ -26,6 +26,7 @@ import {
 	distName
 } from './util/meta.mjs';
 import {docs} from './util/doc.mjs';
+import {isMac, codesign} from './util/mac.mjs';
 import {makeZip, makeTgz, makeExe, makeDmg} from './util/dist.mjs';
 import {copyFile, outputFile, remove} from './util/fs.mjs';
 import {templateStrings} from './util/string.mjs';
@@ -210,8 +211,8 @@ for (const [type, pkg] of Object.entries({
 }
 
 for (const [type, pkg] of Object.entries({
-	'x86_64': 'flash-player-35.0.0.204-mac-x86_64-sa-2022-07-04',
-	'x86_64-debug': 'flash-player-35.0.0.204-mac-x86_64-sa-debug-2022-07-04'
+	'x86_64-arm64': 'flash-player-35.0.0.60-mac-x86_64-arm64-sa-2023-09-23',
+	'x86_64-arm64-debug': 'flash-player-35.0.0.60-mac-x86_64-arm64-sa-debug-2023-09-23'
 })) {
 	const build = `build/mac-${type}`;
 	task[`build:mac-${type}`] = async () => {
@@ -252,6 +253,10 @@ for (const [type, pkg] of Object.entries({
 		b.projector.removeInfoPlistStrings = true;
 		b.projector.removeCodeSignature = true;
 		await b.write(bundler);
+		if (isMac) {
+			await codesign(b.projector.path);
+			await codesign(b.path);
+		}
 		await docs('docs', build);
 	};
 	task[`dist:mac-${type}:tgz`] = async () => {

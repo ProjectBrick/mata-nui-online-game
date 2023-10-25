@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     env:
       SHOCKPKG_PACKAGES: >-
-        flash-player-35.0.0.204-mac-x86_64-sa-2022-07-04
+        flash-player-35.0.0.60-mac-x86_64-arm64-sa-2023-09-23
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,13 +38,13 @@ jobs:
         run: npm exec shockpkg -- install ${{ env.SHOCKPKG_PACKAGES }}
 
       - name: Build
-        run: node make.mjs build:mac-x86_64
+        run: node make.mjs build:mac-x86_64-arm64
 
       - name: Dist tgz
-        run: node make.mjs dist:mac-x86_64:tgz
+        run: node make.mjs dist:mac-x86_64-arm64:tgz
 
       - name: Dist dmg
-        run: node make.mjs dist:mac-x86_64:dmg
+        run: node make.mjs dist:mac-x86_64-arm64:dmg
 
       - name: Artifact build
         uses: actions/upload-artifact@v3
