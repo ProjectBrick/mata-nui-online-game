@@ -1,5 +1,5 @@
-import {copyFile as cf, mkdir, readdir, rm, writeFile} from 'fs/promises';
-import {dirname} from 'path';
+import {copyFile as cf, mkdir, readdir, rm, writeFile} from 'node:fs/promises';
+import {dirname} from 'node:path';
 
 export async function copyFile(src, dst) {
 	await mkdir(dirname(dst), {recursive: true});

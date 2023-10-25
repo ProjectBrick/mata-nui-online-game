@@ -1,10 +1,10 @@
-import {createRequire} from 'module';
-import {createWriteStream} from 'fs';
-import {readdir, mkdir, rm} from 'fs/promises';
-import {basename, dirname} from 'path';
-import {promisify} from 'util';
-import {pipeline} from 'stream';
-import {spawn} from 'child_process';
+import {createRequire} from 'node:module';
+import {createWriteStream} from 'node:fs';
+import {readdir, mkdir, rm} from 'node:fs/promises';
+import {basename, dirname} from 'node:path';
+import {promisify} from 'node:util';
+import {pipeline} from 'node:stream';
+import {spawn} from 'node:child_process';
 
 import archiver from 'archiver';
 import tar from 'tar';

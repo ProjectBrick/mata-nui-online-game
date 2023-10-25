@@ -1,5 +1,5 @@
-import {mkdir, readFile, rename, writeFile} from 'fs/promises';
-import {createHash} from 'crypto';
+import {mkdir, readFile, rename, writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 
 function hash(data) {
 	return createHash('sha256').update(data).digest('hex');

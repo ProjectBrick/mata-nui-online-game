@@ -1,5 +1,5 @@
-import {readdir, readFile, stat, writeFile} from 'fs/promises';
-import {pathToFileURL} from 'url';
+import {readdir, readFile, stat, writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
 
 import {marked} from 'marked';
 import {gfmHeadingId} from 'marked-gfm-heading-id';

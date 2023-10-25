@@ -1,4 +1,4 @@
-import {readFile, readdir} from 'fs/promises';
+import {readFile, readdir} from 'node:fs/promises';
 
 import yauzl from 'yauzl';
 
