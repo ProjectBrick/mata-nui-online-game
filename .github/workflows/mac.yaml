@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      SHOCKPKG_PACKAGES: >-
+        flash-player-35.0.0.204-mac-x86_64-sa-2022-07-04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,12 +25,17 @@ jobs:
       - name: NPM
         run: npm ci
 
-      - name: shockpkg
-        run: |
-          npm exec shockpkg -- update --summary
-          npm exec shockpkg -- install \
-            flash-player-35.0.0.204-mac-x86_64-sa-2022-07-04
-        shell: bash
+      - name: shockpkg Cache
+        uses: actions/cache@v3
+        with:
+          key: shockpkg ${{ env.SHOCKPKG_PACKAGES }}
+          path: shockpkg
+
+      - name: shockpkg Update
+        run: npm exec shockpkg -- update --summary
+
+      - name: shockpkg Install
+        run: npm exec shockpkg -- install ${{ env.SHOCKPKG_PACKAGES }}
 
       - name: Build
         run: node make.mjs build:mac-x86_64

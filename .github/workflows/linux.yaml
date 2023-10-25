@@ -10,6 +10,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SHOCKPKG_PACKAGES: >-
+        flash-player-11.2.202.644-linux-i386-sa
+        flash-player-32.0.0.465-linux-x86_64-sa
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,13 +26,17 @@ jobs:
       - name: NPM
         run: npm ci
 
-      - name: shockpkg
-        run: |
-          npm exec shockpkg -- update --summary
-          npm exec shockpkg -- install \
-            flash-player-11.2.202.644-linux-i386-sa \
-            flash-player-32.0.0.465-linux-x86_64-sa
-        shell: bash
+      - name: shockpkg Cache
+        uses: actions/cache@v3
+        with:
+          key: shockpkg ${{ env.SHOCKPKG_PACKAGES }}
+          path: shockpkg
+
+      - name: shockpkg Update
+        run: npm exec shockpkg -- update --summary
+
+      - name: shockpkg Install
+        run: npm exec shockpkg -- install ${{ env.SHOCKPKG_PACKAGES }}
 
       - name: Build i386
         run: node make.mjs build:linux-i386
