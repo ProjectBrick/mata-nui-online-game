@@ -6,18 +6,18 @@
 	"author": "Project Brick",
 	"copyright": "Copyright 2001 The LEGO Group and Templar Studios LLC. Unofficial release by Project Brick.",
 	"optionalDependencies": {
-		"appdmg": "^0.6.4"
+		"appdmg": "^0.6.6"
 	},
 	"dependencies": {
-		"@shockpkg/cli": "^2.0.2",
-		"@shockpkg/core": "^2.0.1",
-		"@shockpkg/plist-dom": "^3.0.1",
-		"@shockpkg/swf-projector": "^4.0.0",
-		"archiver": "^5.3.1",
-		"ejs": "^3.1.8",
+		"@shockpkg/cli": "^3.0.5",
+		"@shockpkg/core": "^3.0.4",
+		"@shockpkg/plist-dom": "^4.0.3",
+		"@shockpkg/swf-projector": "^5.0.0",
+		"archiver": "^6.0.1",
+		"ejs": "^3.1.9",
 		"innosetup": "^6.0.5",
-		"marked": "^4.1.1",
-		"tar": "^6.1.11",
+		"marked": "^9.1.2",
+		"tar": "^6.2.0",
 		"yauzl": "^2.10.0"
 	}
 }

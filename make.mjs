@@ -8,9 +8,9 @@ import {
 	ValueBoolean
 } from '@shockpkg/plist-dom';
 import {
-	BundleWindows,
-	BundleMacApp,
-	BundleLinux,
+	BundleSaWindows,
+	BundleSaMac,
+	BundleSaLinux,
 	loader
 } from '@shockpkg/swf-projector';
 
@@ -62,36 +62,34 @@ async function * resources() {
 	}
 }
 
-async function bundle(bundle, pkg, delay = false) {
+function movie(delay) {
 	const swfv = 6;
 	const [w, h] = [770, 475];
 	const fps = 18;
 	const bg = 0x000000;
 	const url = 'matanuionlinegame.swf';
-	await bundle.withData(
-		await (new Manager()).with(m => m.packageInstallFile(pkg)),
-		loader(swfv, w, h, fps, bg, url, delay ? Math.round(fps / 2) : 0),
-		async b => {
-			for await (const [file, data] of resources()) {
-				await b.createResourceFile(file, data);
-			}
-			await b.copyResourceFile(
-				'matanuionlinegame.swf',
-				'src/projector/matanuionlinegame.swf'
-			);
-			await b.copyResourceFile(
-				'matanuionlinegame-30fps.swf',
-				'src/projector/matanuionlinegame-30fps.swf'
-			);
-			await b.copyResourceFile(
-				'init.swf',
-				'src/shared/init.swf'
-			);
-			await b.copyResourceFile(
-				'overlay.swf',
-				'src/shared/overlay.swf'
-			);
-		}
+	return loader(swfv, w, h, fps, bg, url, delay ? Math.round(fps / 2) : 0);
+}
+
+async function bundler(b) {
+	for await (const [file, data] of resources()) {
+		await b.createResourceFile(file, data);
+	}
+	await b.copyResourceFile(
+		'matanuionlinegame.swf',
+		'src/projector/matanuionlinegame.swf'
+	);
+	await b.copyResourceFile(
+		'matanuionlinegame-30fps.swf',
+		'src/projector/matanuionlinegame-30fps.swf'
+	);
+	await b.copyResourceFile(
+		'init.swf',
+		'src/shared/init.swf'
+	);
+	await b.copyResourceFile(
+		'overlay.swf',
+		'src/shared/overlay.swf'
 	);
 }
 
@@ -163,7 +161,9 @@ for (const [type, pkg] of Object.entries({
 	task[`build:windows-${type}`] = async () => {
 		await remove(build);
 		const file = `${appFile}.exe`;
-		const b = new BundleWindows(`${build}/${file}`);
+		const b = new BundleSaWindows(`${build}/${file}`);
+		b.projector.player = await new Manager().file(pkg);
+		b.projector.movieData = movie(false);
 		b.projector.versionStrings = {
 			FileVersion: version,
 			ProductVersion: versionShort,
@@ -180,7 +180,7 @@ for (const [type, pkg] of Object.entries({
 		b.projector.patchWindowTitle = appName;
 		b.projector.patchOutOfDateDisable = true;
 		b.projector.removeCodeSignature = true;
-		await bundle(b, pkg);
+		await b.write(bundler);
 		await docs('docs', build);
 	};
 	task[`dist:windows-${type}:zip`] = async () => {
@@ -217,7 +217,9 @@ for (const [type, pkg] of Object.entries({
 	task[`build:mac-${type}`] = async () => {
 		await remove(build);
 		const pkgInfo = 'APPL????';
-		const b = new BundleMacApp(`${build}/${appFile}.app`);
+		const b = new BundleSaMac(`${build}/${appFile}.app`);
+		b.projector.player = await new Manager().file(pkg);
+		b.projector.movieData = movie(false);
 		b.projector.binaryName = appFile;
 		b.projector.pkgInfoData = pkgInfo;
 		b.projector.infoPlistData = (new Plist(new ValueDict(new Map([
@@ -249,7 +251,7 @@ for (const [type, pkg] of Object.entries({
 		b.projector.patchWindowTitle = appName;
 		b.projector.removeInfoPlistStrings = true;
 		b.projector.removeCodeSignature = true;
-		await bundle(b, pkg);
+		await b.write(bundler);
 		await docs('docs', build);
 	};
 	task[`dist:mac-${type}:tgz`] = async () => {
@@ -281,11 +283,13 @@ for (const [type, pkg] of Object.entries({
 	const build = `build/linux-${type}`;
 	task[`build:linux-${type}`] = async () => {
 		await remove(build);
-		const b = new BundleLinux(`${build}/${appFile}`);
+		const b = new BundleSaLinux(`${build}/${appFile}`);
+		b.projector.player = await new Manager().file(pkg);
+		b.projector.movieData = movie(true);
 		b.projector.patchProjectorOffset = /x86_64/.test(type);
 		b.projector.patchProjectorPath = true;
 		b.projector.patchWindowTitle = appName;
-		await bundle(b, pkg, true);
+		await b.write(bundler);
 		await docs('docs', build);
 	};
 	task[`dist:linux-${type}:tgz`] = async () => {
