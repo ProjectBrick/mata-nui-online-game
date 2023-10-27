@@ -2,14 +2,11 @@ import {createRequire} from 'node:module';
 import {createWriteStream} from 'node:fs';
 import {readdir, mkdir, rm} from 'node:fs/promises';
 import {basename, dirname} from 'node:path';
-import {promisify} from 'node:util';
-import {pipeline} from 'node:stream';
+import {pipeline} from 'node:stream/promises';
 import {spawn} from 'node:child_process';
 
 import archiver from 'archiver';
 import tar from 'tar';
-
-const pipe = promisify(pipeline);
 
 export async function makeZip(target, source) {
 	await rm(target, {force: true});
@@ -22,7 +19,7 @@ export async function makeZip(target, source) {
 	archive.on('warning', err => {
 		archive.emit('error', err);
 	});
-	const done = pipe(archive, createWriteStream(target));
+	const done = pipeline(archive, createWriteStream(target));
 	archive.directory(source, false);
 	await Promise.all([archive.finalize(), done]);
 }
