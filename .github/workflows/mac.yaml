@@ -16,10 +16,10 @@ jobs:
         flash-player-35.0.0.60-mac-x86_64-arm64-sa-2023-09-23
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
