@@ -27,6 +27,10 @@ jobs:
       - name: NPM
         run: npm ci
 
+      - name: NPM util/windows
+        working-directory: util/windows
+        run: npm ci
+
       - name: shockpkg Cache
         uses: actions/cache@v3
         with:

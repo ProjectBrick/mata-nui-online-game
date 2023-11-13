@@ -1,83 +1,9 @@
 import {createRequire} from 'node:module';
-import {createWriteStream} from 'node:fs';
-import {readdir, mkdir, rm} from 'node:fs/promises';
+import {rm} from 'node:fs/promises';
 import {basename, dirname} from 'node:path';
-import {pipeline} from 'node:stream/promises';
 import {spawn} from 'node:child_process';
 
-import archiver from 'archiver';
-import tar from 'tar';
-
-export async function makeZip(target, source) {
-	await rm(target, {force: true});
-	await mkdir(dirname(target), {recursive: true});
-	const archive = archiver('zip', {
-		zlib: {
-			level: 9
-		}
-	});
-	archive.on('warning', err => {
-		archive.emit('error', err);
-	});
-	const done = pipeline(archive, createWriteStream(target));
-	archive.directory(source, false);
-	await Promise.all([archive.finalize(), done]);
-}
-
-export async function makeTgz(target, source) {
-	await rm(target, {force: true});
-	await mkdir(dirname(target), {recursive: true});
-	await tar.create(
-		{
-			gzip: true,
-			portable: true,
-			file: target,
-			cwd: source
-		},
-		(await readdir(source)).sort()
-	);
-}
-
-export async function makeDmg(
-	target,
-	title,
-	icon,
-	background,
-	size,
-	iconSize,
-	contents
-) {
-	await rm(target, {force: true});
-	const {default: appdmg} = await import('appdmg');
-	await mkdir(dirname(target), {recursive: true});
-	await new Promise((resolve, reject) => {
-		const dmg = appdmg({
-			basepath: '.',
-			target,
-			specification: {
-				format: 'UDBZ',
-				title,
-				'icon-size': iconSize,
-				icon,
-				background,
-				window: {
-					size: {
-						width: size[0],
-						height: size[1]
-					}
-				},
-				contents: contents.map(([x, y, type, path]) => ({
-					x: (size[0] / 2) + x,
-					y: (size[1] / 2) + y,
-					type,
-					path
-				}))
-			}
-		});
-		dmg.on('error', reject);
-		dmg.on('finish', resolve);
-	});
-}
+export const isWindows = /^win/.test(process.platform);
 
 function createIss(config) {
 	return '\ufeff' + Object.entries(config).map(([s, p]) => {
@@ -88,7 +14,7 @@ function createIss(config) {
 	}).join('\n');
 }
 
-export async function makeExe(
+export async function exe(
 	target,
 	arch,
 	id,
@@ -182,7 +108,7 @@ export async function makeExe(
 		}))
 	});
 	const require = createRequire(import.meta.url);
-	const argv = /^win/.test(process.platform) ? [] : ['wine'];
+	const argv = isWindows ? [] : ['wine'];
 	const iscc = require.resolve('innosetup/bin/ISCC.exe');
 	argv.push(iscc);
 	argv.push('/q');
