@@ -1,6 +1,7 @@
 {
 	"private": true,
 	"dependencies": {
-		"appdmg": "^0.6.6"
+		"appdmg": "^0.6.6",
+		"node-gyp": "^10.0.1"
 	}
 }
